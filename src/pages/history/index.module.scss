@@ -1,0 +1,154 @@
+@use '@/styles/variables.scss' as *;
+
+.historyPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding: $page-padding;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.statsRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.winValue {
+  color: $color-success;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.historyCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.gameIcon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: $radius-sm;
+  background-color: $color-bg-hover;
+  margin-right: $spacing-md;
+}
+
+.eventInfo {
+  flex: 1;
+}
+
+.eventTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.eventDate {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.resultBadge {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+}
+
+.resultWin {
+  background-color: rgba($color-success, 0.1);
+  
+  .resultText {
+    color: $color-success;
+  }
+}
+
+.resultLose {
+  background-color: rgba($color-error, 0.1);
+  
+  .resultText {
+    color: $color-error;
+  }
+}
+
+.resultOther {
+  background-color: rgba($color-text-tertiary, 0.1);
+  
+  .resultText {
+    color: $color-text-tertiary;
+  }
+}
+
+.resultText {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+.prizeInfo {
+  padding: $spacing-sm;
+  background-color: $color-bg-hover;
+  border-radius: $radius-sm;
+  margin-top: $spacing-sm;
+}
+
+.prizeLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.prizeText {
+  font-size: $font-size-sm;
+  color: $color-gold;
+  font-weight: $font-weight-medium;
+  margin-top: 4rpx;
+}

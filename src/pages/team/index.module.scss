@@ -4,25 +4,422 @@
   min-height: 100vh;
   background-color: $color-bg-page;
   padding: $page-padding;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.teamList {
+  margin-bottom: $spacing-lg;
+}
+
+.teamCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.teamHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: $spacing-md;
+}
+
+.teamAvatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-md;
+  background-color: $color-bg-hover;
+  margin-right: $spacing-md;
+}
+
+.teamInfo {
+  flex: 1;
+}
+
+.teamName {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.teamCapacity {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.teamAction {
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-primary;
+  border-radius: $radius-round;
+}
+
+.teamActionText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+}
+
+.membersSection {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx solid $color-divider;
+}
+
+.membersTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.membersList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.memberItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  background-color: $color-bg-hover;
+  border-radius: $radius-round;
+}
+
+.memberAvatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  margin-right: $spacing-xs;
+}
+
+.memberName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.captainBadge {
+  font-size: $font-size-xs;
+  color: $color-gold;
+  margin-left: 4rpx;
+}
+
+.createTeamCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border: 2rpx dashed $color-border;
 }
 
-.placeholderIcon {
-  font-size: 120rpx;
-  margin-bottom: $spacing-lg;
-}
-
-.placeholderTitle {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
-  color: $color-text-primary;
+.createIcon {
+  font-size: 64rpx;
   margin-bottom: $spacing-sm;
 }
 
-.placeholderDesc {
+.createText {
   font-size: $font-size-md;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 100%;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $spacing-lg;
+  padding-bottom: calc($spacing-lg + env(safe-area-inset-bottom));
+  max-height: 85vh;
+}
+
+.modalHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.modalClose {
+  font-size: $font-size-xxl;
   color: $color-text-tertiary;
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+}
+
+.formLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.formInput {
+  width: 100%;
+  height: $button-height-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  border: 2rpx solid $color-border;
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  margin-top: $spacing-md;
+}
+
+.submitBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.teamDetailModal {
+  width: 100%;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $spacing-lg;
+  padding-bottom: calc($spacing-lg + env(safe-area-inset-bottom));
+  max-height: 70vh;
+}
+
+.detailHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: $spacing-lg;
+}
+
+.detailAvatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-md;
+  background-color: $color-bg-hover;
+  margin-right: $spacing-md;
+}
+
+.detailName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.detailMeta {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.memberManagement {
+  margin-top: $spacing-md;
+}
+
+.memberManagementTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.addMemberBtn {
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-primary;
+  border-radius: $radius-round;
+}
+
+.addMemberText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+}
+
+.memberListItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.memberListAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  margin-right: $spacing-md;
+}
+
+.memberListInfo {
+  flex: 1;
+}
+
+.memberListName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.memberListRole {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.memberListAction {
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-round;
+}
+
+.memberListActionText {
+  font-size: $font-size-sm;
+  color: $color-error;
+}
+
+.actionBtns {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+}
+
+.deleteBtn {
+  background-color: $color-error;
+  color: $color-text-white;
+}
+
+.registerBtn {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
+
+.inviteItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-sm;
+  margin-bottom: $spacing-md;
+}
+
+.inviteAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-card;
+  margin-right: $spacing-md;
+}
+
+.inviteInfo {
+  flex: 1;
+}
+
+.inviteName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+}
+
+.invitePlaceholder {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.inviteInput {
+  flex: 1;
+  height: 64rpx;
+  background-color: $color-bg-card;
+  border-radius: $radius-sm;
+  padding: 0 $spacing-md;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  border: 2rpx solid $color-border;
+  margin-right: $spacing-md;
+}
+
+.inviteSubmitBtn {
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-primary;
+  border-radius: $radius-round;
+}
+
+.inviteSubmitText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+}
+
+.emptyHint {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
 }

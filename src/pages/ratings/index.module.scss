@@ -1,0 +1,235 @@
+@use '@/styles/variables.scss' as *;
+
+.ratingsPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding: $page-padding;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-primary;
+  border-radius: $radius-round;
+  margin-top: $spacing-md;
+}
+
+.addBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-white;
+}
+
+.ratingList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.ratingCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.eventTitle {
+  flex: 1;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.ratingStars {
+  display: flex;
+  flex-direction: row;
+  margin-left: $spacing-sm;
+}
+
+.star {
+  font-size: 28rpx;
+  margin-left: 4rpx;
+}
+
+.starFilled {
+  color: $color-gold;
+}
+
+.starEmpty {
+  color: $color-text-disabled;
+}
+
+.ratingContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  margin-bottom: $spacing-sm;
+}
+
+.ratingDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.replySection {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: $color-bg-hover;
+  border-radius: $radius-sm;
+}
+
+.replyLabel {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  margin-bottom: 4rpx;
+}
+
+.replyContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 100%;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg $radius-lg 0 0;
+  padding: $spacing-lg;
+  padding-bottom: calc($spacing-lg + env(safe-area-inset-bottom));
+}
+
+.modalHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.modalClose {
+  font-size: $font-size-xxl;
+  color: $color-text-tertiary;
+}
+
+.formItem {
+  margin-bottom: $spacing-lg;
+}
+
+.formLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.starSelector {
+  display: flex;
+  flex-direction: row;
+}
+
+.starOption {
+  font-size: 48rpx;
+  margin-right: $spacing-sm;
+  color: $color-text-disabled;
+}
+
+.starOptionActive {
+  color: $color-gold;
+}
+
+.formTextarea {
+  width: 100%;
+  min-height: 200rpx;
+  background-color: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  border: 2rpx solid $color-border;
+}
+
+.submitBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+}
+
+.submitBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.eventSelector {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.eventOption {
+  padding: $spacing-sm $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+  max-width: 100%;
+}
+
+.eventOptionActive {
+  background-color: $color-tag-bg;
+  border-color: $color-primary;
+}
+
+.eventText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.eventTextActive {
+  color: $color-primary;
+}

@@ -1,24 +1,12 @@
 import React from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { mockTeams } from '@/data/teams';
+import { mockTeams, mockHistory } from '@/data/teams';
+import { getUnreadCount } from '@/data/notifications';
 import styles from './index.module.scss';
 
-interface HistoryRecord {
-  id: string;
-  title: string;
-  time: string;
-  result: 'win' | 'lose' | 'other';
-}
-
-const mockHistory: HistoryRecord[] = [
-  { id: 'h1', title: '周末英雄联盟争霸赛', time: '2024-01-20', result: 'win' },
-  { id: 'h2', title: '无畏契约新人赛', time: '2024-01-21', result: 'lose' },
-  { id: 'h3', title: 'DOTA2水友赛', time: '2024-01-22', result: 'win' },
-];
-
 const MinePage: React.FC = () => {
-  const unreadCount = 2;
+  const unreadCount = getUnreadCount();
 
   const handleMenuClick = (type: string) => {
     switch (type) {
@@ -29,13 +17,16 @@ const MinePage: React.FC = () => {
         Taro.navigateTo({ url: '/pages/team/index' });
         break;
       case 'history':
-        Taro.showToast({ title: '查看全部战绩', icon: 'none' });
+        Taro.navigateTo({ url: '/pages/history/index' });
         break;
       case 'contact':
-        Taro.showToast({ title: '联系方式管理', icon: 'none' });
+        Taro.navigateTo({ url: '/pages/contacts/index' });
+        break;
+      case 'rating':
+        Taro.navigateTo({ url: '/pages/ratings/index' });
         break;
       case 'settings':
-        Taro.showToast({ title: '设置', icon: 'none' });
+        Taro.showToast({ title: '设置功能开发中', icon: 'none' });
         break;
       default:
         break;
@@ -66,15 +57,15 @@ const MinePage: React.FC = () => {
 
         <View className={styles.statsSection}>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>12</Text>
+            <Text className={styles.statValue}>{mockHistory.length}</Text>
             <Text className={styles.statLabel}>参与赛事</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>3</Text>
+            <Text className={styles.statValue}>{mockTeams.length}</Text>
             <Text className={styles.statLabel}>我的战队</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>8</Text>
+            <Text className={styles.statValue}>{mockHistory.filter(h => h.result === 'win').length}</Text>
             <Text className={styles.statLabel}>获胜场次</Text>
           </View>
         </View>
@@ -91,7 +82,7 @@ const MinePage: React.FC = () => {
           <ScrollView scrollX>
             <View className={styles.teamList}>
               {mockTeams.slice(0, 3).map((team) => (
-                <View key={team.id} className={styles.teamItem}>
+                <View key={team.id} className={styles.teamItem} onClick={() => handleMenuClick('team')}>
                   <Image 
                     src={team.avatar}
                     className={styles.teamAvatar}
@@ -117,16 +108,16 @@ const MinePage: React.FC = () => {
               查看全部
             </Text>
           </View>
-          {mockHistory.map((record) => (
-            <View key={record.id} className={styles.historyItem}>
+          {mockHistory.slice(0, 3).map((record) => (
+            <View key={record.id} className={styles.historyItem} onClick={() => handleMenuClick('history')}>
               <Image 
-                src="https://picsum.photos/id/1/100/100"
+                src={record.gameIcon}
                 className={styles.historyIcon}
                 mode="aspectFill"
               />
               <View className={styles.historyContent}>
-                <Text className={styles.historyTitle}>{record.title}</Text>
-                <Text className={styles.historyTime}>{record.time}</Text>
+                <Text className={styles.historyTitle}>{record.eventTitle}</Text>
+                <Text className={styles.historyTime}>{record.date}</Text>
               </View>
               <View className={`${styles.historyResult} ${record.result === 'win' ? styles.resultWin : styles.resultLose}`}>
                 <Text className={styles.resultText}>
@@ -154,6 +145,13 @@ const MinePage: React.FC = () => {
             <View className={styles.menuLeft}>
               <Text className={styles.menuIcon}>📱</Text>
               <Text className={styles.menuText}>联系方式</Text>
+            </View>
+            <Text className={styles.menuArrow}>›</Text>
+          </View>
+          <View className={styles.menuItem} onClick={() => handleMenuClick('rating')}>
+            <View className={styles.menuLeft}>
+              <Text className={styles.menuIcon}>⭐</Text>
+              <Text className={styles.menuText}>我的评价</Text>
             </View>
             <Text className={styles.menuArrow}>›</Text>
           </View>

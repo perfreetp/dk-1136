@@ -6,7 +6,10 @@ export default defineAppConfig({
     'pages/detail/index',
     'pages/team/index',
     'pages/notification/index',
-    'pages/schedule/index'
+    'pages/schedule/index',
+    'pages/history/index',
+    'pages/contacts/index',
+    'pages/ratings/index'
   ],
   window: {
     backgroundTextStyle: 'dark',

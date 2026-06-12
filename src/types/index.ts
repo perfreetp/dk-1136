@@ -16,6 +16,9 @@ export interface Event {
   organizerId: string;
   organizerName: string;
   machineCount: number;
+  signInStart: string;
+  signInEnd: string;
+  rules: string;
 }
 
 export interface Team {
@@ -28,6 +31,7 @@ export interface Team {
   captainName: string;
   members: TeamMember[];
   createdAt: string;
+  eventId?: string;
 }
 
 export interface TeamMember {
@@ -62,13 +66,46 @@ export interface Match {
   eventId: string;
   round: number;
   matchNumber: number;
-  team1: Team;
-  team2: Team;
+  team1Id: string;
+  team1Name: string;
+  team1Avatar: string;
+  team2Id: string;
+  team2Name: string;
+  team2Avatar: string;
   score1?: number;
   score2?: number;
   status: 'pending' | 'ongoing' | 'finished';
   startTime: string;
-  winner?: string;
+  winnerId?: string;
+}
+
+export interface HistoryRecord {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  game: string;
+  gameIcon: string;
+  result: 'win' | 'lose' | 'other';
+  prize?: string;
+  date: string;
+}
+
+export interface Contact {
+  id: string;
+  name: string;
+  phone: string;
+  role: string;
+  teamId?: string;
+}
+
+export interface Rating {
+  id: string;
+  eventId: string;
+  eventTitle: string;
+  rating: number;
+  content: string;
+  date: string;
+  organizerReply?: string;
 }
 
 export type GameCategory = 'all' | 'lol' | 'dota2' | 'csgo' | 'valorant' | 'pubg' | 'other';

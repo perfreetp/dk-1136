@@ -1,4 +1,4 @@
-import { Event } from '@/types';
+import { Event, Team, Match } from '@/types';
 
 export const mockEvents: Event[] = [
   {
@@ -18,7 +18,10 @@ export const mockEvents: Event[] = [
     description: '欢迎各路召唤师前来挑战！比赛采用淘汰制，每局BO1，决赛BO3。',
     organizerId: 'org1',
     organizerName: '极速网吧',
-    machineCount: 20
+    machineCount: 20,
+    signInStart: '2024-01-20 12:00',
+    signInEnd: '2024-01-20 13:30',
+    rules: '1. 比赛采用单淘汰制\n2. 每场比赛BO1，决赛BO3\n3. 迟到10分钟视为弃权\n4. 服从裁判判决'
   },
   {
     id: '2',
@@ -37,7 +40,10 @@ export const mockEvents: Event[] = [
     description: '专为新手设计的比赛，欢迎0-10级玩家参加！',
     organizerId: 'org2',
     organizerName: '星辰电竞馆',
-    machineCount: 16
+    machineCount: 16,
+    signInStart: '2024-01-21 14:00',
+    signInEnd: '2024-01-21 14:30',
+    rules: '1. 仅限0-10级玩家参加\n2. 比赛采用积分制\n3. 共进行3轮小组赛'
   },
   {
     id: '3',
@@ -56,7 +62,10 @@ export const mockEvents: Event[] = [
     description: '纯娱乐性质比赛，重在参与，欢乐为主！',
     organizerId: 'org3',
     organizerName: '雷霆网吧',
-    machineCount: 24
+    machineCount: 24,
+    signInStart: '2024-01-22 17:00',
+    signInEnd: '2024-01-22 17:30',
+    rules: '1. 娱乐为主，友谊第一\n2. 比赛采用循环赛制\n3. 不限制英雄选择'
   },
   {
     id: '4',
@@ -75,7 +84,10 @@ export const mockEvents: Event[] = [
     description: '高水平竞技比赛，邀请各路高手参与！',
     organizerId: 'org1',
     organizerName: '极速网吧',
-    machineCount: 20
+    machineCount: 20,
+    signInStart: '2024-01-23 12:00',
+    signInEnd: '2024-01-23 12:30',
+    rules: '1. 专业竞技规则\n2. 采用BO3淘汰赛\n3. 禁止使用任何作弊程序'
   },
   {
     id: '5',
@@ -94,7 +106,10 @@ export const mockEvents: Event[] = [
     description: '四排模式，积分制，共进行5场比赛！',
     organizerId: 'org2',
     organizerName: '星辰电竞馆',
-    machineCount: 16
+    machineCount: 16,
+    signInStart: '2024-01-24 18:00',
+    signInEnd: '2024-01-24 18:30',
+    rules: '1. 四排模式\n2. 积分制，共5场比赛\n3. 击杀积分+排名积分'
   },
   {
     id: '6',
@@ -113,7 +128,10 @@ export const mockEvents: Event[] = [
     description: '情人节特别赛事，情侣组队参加！',
     organizerId: 'org3',
     organizerName: '雷霆网吧',
-    machineCount: 24
+    machineCount: 24,
+    signInStart: '2024-01-25 13:00',
+    signInEnd: '2024-01-25 13:30',
+    rules: '1. 必须是情侣组队\n2. 双排模式\n3. 比赛中需同队'
   },
   {
     id: '7',
@@ -132,7 +150,10 @@ export const mockEvents: Event[] = [
     description: '周末狂欢，无畏契约等你来战！',
     organizerId: 'org1',
     organizerName: '极速网吧',
-    machineCount: 20
+    machineCount: 20,
+    signInStart: '2024-01-26 14:00',
+    signInEnd: '2024-01-26 14:30',
+    rules: '1. 标准竞技规则\n2. BO1小组赛+BO3决赛\n3. 禁止使用Bug'
   },
   {
     id: '8',
@@ -151,7 +172,10 @@ export const mockEvents: Event[] = [
     description: '欢迎老玩家回归，重温DOTA2经典！',
     organizerId: 'org2',
     organizerName: '星辰电竞馆',
-    machineCount: 16
+    machineCount: 16,
+    signInStart: '2024-01-27 17:00',
+    signInEnd: '2024-01-27 17:30',
+    rules: '1. 欢迎所有老玩家\n2. 比赛采用BO1循环赛\n3. 重在交流'
   },
   {
     id: '9',
@@ -170,7 +194,10 @@ export const mockEvents: Event[] = [
     description: '新手专属，专业教练指导！',
     organizerId: 'org3',
     organizerName: '雷霆网吧',
-    machineCount: 24
+    machineCount: 24,
+    signInStart: '2024-01-28 13:30',
+    signInEnd: '2024-01-28 13:45',
+    rules: '1. 新手入门教学\n2. 专业教练现场指导\n3. 实践比赛'
   },
   {
     id: '10',
@@ -189,8 +216,49 @@ export const mockEvents: Event[] = [
     description: '多种游戏轮番上阵，综合积分制！',
     organizerId: 'org1',
     organizerName: '极速网吧',
-    machineCount: 20
+    machineCount: 20,
+    signInStart: '2024-01-29 11:00',
+    signInEnd: '2024-01-29 11:30',
+    rules: '1. 多种游戏项目\n2. 综合积分制\n3. 趣味性为主'
   }
 ];
 
 export const hotEvents = mockEvents.filter(e => e.status === 'ongoing' || e.currentTeams >= 10).slice(0, 3);
+
+export const registeredTeams: Record<string, Team[]> = {
+  '1': [
+    { id: 't1', name: '无敌战队', avatar: 'https://picsum.photos/id/1/200/200', memberCount: 5, maxMembers: 5, captainId: 'u1', captainName: '小明', members: [{ id: 'u1', name: '小明', avatar: 'https://picsum.photos/id/64/100/100', role: 'captain' }, { id: 'u2', name: '阿杰', avatar: 'https://picsum.photos/id/91/100/100', role: 'member' }], createdAt: '2024-01-10' },
+    { id: 't2', name: '王者归来', avatar: 'https://picsum.photos/id/2/200/200', memberCount: 5, maxMembers: 5, captainId: 'u2', captainName: '阿杰', members: [{ id: 'u2', name: '阿杰', avatar: 'https://picsum.photos/id/91/100/100', role: 'captain' }], createdAt: '2024-01-12' },
+    { id: 't3', name: '绝地求生', avatar: 'https://picsum.photos/id/3/200/200', memberCount: 5, maxMembers: 5, captainId: 'u3', captainName: '大壮', members: [], createdAt: '2024-01-15' },
+    { id: 't4', name: '星辰大海', avatar: 'https://picsum.photos/id/6/200/200', memberCount: 5, maxMembers: 5, captainId: 'u4', captainName: '小王', members: [], createdAt: '2024-01-18' },
+    { id: 't5', name: '电竞新秀', avatar: 'https://picsum.photos/id/8/200/200', memberCount: 4, maxMembers: 5, captainId: 'u5', captainName: '阿强', members: [], createdAt: '2024-01-20' },
+  ],
+  '2': [
+    { id: 't6', name: '无畏先锋', avatar: 'https://picsum.photos/id/119/200/200', memberCount: 5, maxMembers: 5, captainId: 'u6', captainName: '小刚', members: [], createdAt: '2024-01-19' },
+    { id: 't7', name: '特战精英', avatar: 'https://picsum.photos/id/160/200/200', memberCount: 5, maxMembers: 5, captainId: 'u7', captainName: '阿华', members: [], createdAt: '2024-01-19' },
+  ]
+};
+
+export const mockMatches: Record<string, Match[]> = {
+  '2': [
+    { id: 'm1', eventId: '2', round: 1, matchNumber: 1, team1Id: 't6', team1Name: '无畏先锋', team1Avatar: 'https://picsum.photos/id/119/200/200', team2Id: 't7', team2Name: '特战精英', team2Avatar: 'https://picsum.photos/id/160/200/200', score1: 13, score2: 8, status: 'finished', startTime: '2024-01-21 15:00', winnerId: 't6' },
+    { id: 'm2', eventId: '2', round: 2, matchNumber: 1, team1Id: 't6', team1Name: '无畏先锋', team1Avatar: 'https://picsum.photos/id/119/200/200', team2Id: 't8', team2Name: '待定', team2Avatar: '', status: 'pending', startTime: '2024-01-21 17:00' },
+  ],
+  '4': [
+    { id: 'm3', eventId: '4', round: 1, matchNumber: 1, team1Id: 't9', team1Name: '狙击之王', team1Avatar: 'https://picsum.photos/id/201/200/200', team2Id: 't10', team2Name: '反恐精英', team2Avatar: 'https://picsum.photos/id/1/200/200', score1: 16, score2: 14, status: 'finished', startTime: '2024-01-23 13:00', winnerId: 't9' },
+    { id: 'm4', eventId: '4', round: 1, matchNumber: 2, team1Id: 't11', team1Name: '暗影战队', team1Avatar: 'https://picsum.photos/id/2/200/200', team2Id: 't12', team2Name: '烈焰之魂', team2Avatar: 'https://picsum.photos/id/3/200/200', score1: 9, score2: 16, status: 'finished', startTime: '2024-01-23 13:00', winnerId: 't12' },
+    { id: 'm5', eventId: '4', round: 2, matchNumber: 1, team1Id: 't9', team1Name: '狙击之王', team1Avatar: 'https://picsum.photos/id/201/200/200', team2Id: 't12', team2Name: '烈焰之魂', team2Avatar: 'https://picsum.photos/id/3/200/200', status: 'ongoing', startTime: '2024-01-23 16:00' },
+  ]
+};
+
+export const getEventById = (id: string): Event | undefined => {
+  return mockEvents.find(e => e.id === id);
+};
+
+export const getRegisteredTeams = (eventId: string): Team[] => {
+  return registeredTeams[eventId] || [];
+};
+
+export const getMatches = (eventId: string): Match[] => {
+  return mockMatches[eventId] || [];
+};

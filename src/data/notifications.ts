@@ -55,20 +55,35 @@ export const mockNotifications: Notification[] = [
   },
   {
     id: 'n7',
-    type: 'event',
-    title: '赛事取消通知',
-    content: '很抱歉，您报名的「测试赛事」因报名人数不足已取消，报名费将原路退回。',
-    time: '3天前',
-    isRead: true,
-    eventId: '999'
-  },
-  {
-    id: 'n8',
     type: 'match',
     title: '裁决结果',
-    content: '您申请的裁决已处理，比赛结果已确认。',
+    content: '您申请的裁决已处理，比分已更正为13:11。',
     time: '1周前',
     isRead: true,
     eventId: '1'
+  },
+  {
+    id: 'n8',
+    type: 'event',
+    title: '新赛事上线',
+    content: '「英雄联盟情侣双排赛」开始报名啦，快来参加！',
+    time: '3天前',
+    isRead: true,
+    eventId: '6'
   }
 ];
+
+export const getUnreadCount = (): number => {
+  return mockNotifications.filter(n => !n.isRead).length;
+};
+
+export const getNotifications = (): Notification[] => {
+  return mockNotifications;
+};
+
+export const markAsRead = (id: string): void => {
+  const notification = mockNotifications.find(n => n.id === id);
+  if (notification) {
+    notification.isRead = true;
+  }
+};
