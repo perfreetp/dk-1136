@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import { Match } from '@/types';
-import { getEvent, getMatches, submitScore, generateMatches, getMaxRound, getRoundName, getSignedInTeams, canRegenerateMatches, clearMatches, getTotalRounds } from '@/utils/unifiedData';
+import { getEvent, getMatches, submitScore, generateMatches, getMaxRound, getRoundName, getSignedInTeams, canRegenerateMatches, clearMatches, getTotalRounds, getMatchProgress } from '@/utils/unifiedData';
 import { submitDispute } from '@/data/notifications';
 import styles from './index.module.scss';
 
@@ -12,6 +12,7 @@ const SchedulePage: React.FC = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [activeRound, setActiveRound] = useState(1);
   const [maxRound, setMaxRound] = useState(0);
+  const [progress, setProgress] = useState<any>(null);
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
@@ -42,12 +43,17 @@ const SchedulePage: React.FC = () => {
       let eventMatches = getMatches(id);
       if (eventMatches.length === 0 && signedInTeams.length >= 2) {
         eventMatches = generateMatches(id);
+      } else if (eventMatches.length > 0) {
+        eventMatches = generateMatches(id);
       }
 
       setMatches(eventMatches);
       const totalRounds = getTotalRounds(signedInTeams.length);
       setMaxRound(totalRounds);
       setActiveRound(1);
+
+      const matchProgress = getMatchProgress(id);
+      setProgress(matchProgress);
     }
   };
 
@@ -56,7 +62,7 @@ const SchedulePage: React.FC = () => {
 
   const handleScoreSubmit = () => {
     if (!selectedMatch || !eventId) return;
-    
+
     const s1 = parseInt(score1);
     const s2 = parseInt(score2);
 
@@ -65,15 +71,19 @@ const SchedulePage: React.FC = () => {
       return;
     }
 
-    const updatedMatch = submitScore(eventId, selectedMatch.id, s1, s2);
+    const result = submitScore(eventId, selectedMatch.id, s1, s2);
+
+    if (!result.success) {
+      Taro.showToast({ title: result.error || '提交失败', icon: 'none' });
+      return;
+    }
+
     loadEventData(eventId);
     setShowScoreModal(false);
     setScore1('');
     setScore2('');
-    
-    if (updatedMatch?.winnerId) {
-      Taro.showToast({ title: '比分已提交', icon: 'success' });
-    }
+
+    Taro.showToast({ title: '比分已提交', icon: 'success' });
   };
 
   const handleDisputeSubmit = () => {
@@ -109,6 +119,10 @@ const SchedulePage: React.FC = () => {
         }
       }
     });
+  };
+
+  const handleRoundChange = (round: number) => {
+    setActiveRound(round);
   };
 
   const openScoreModal = (match: Match) => {
@@ -192,12 +206,32 @@ const SchedulePage: React.FC = () => {
           <Text className={styles.eventTitle}>{eventData?.info?.title || '赛事'}</Text>
           <Text className={styles.eventMeta}>{eventData?.info?.location}</Text>
         </View>
+
+        {progress && progress.total > 0 && (
+          <View className={styles.progressSection}>
+            <View className={styles.progressItem}>
+              <Text className={styles.progressValue}>{progress.currentRoundName}</Text>
+              <Text className={styles.progressLabel}>当前轮次</Text>
+            </View>
+            <View className={styles.progressDivider}></View>
+            <View className={styles.progressItem}>
+              <Text className={styles.progressValue}>{progress.finished}/{progress.total}</Text>
+              <Text className={styles.progressLabel}>已完成</Text>
+            </View>
+            <View className={styles.progressDivider}></View>
+            <View className={styles.progressItem}>
+              <Text className={styles.progressValue}>{progress.remaining}</Text>
+              <Text className={styles.progressLabel}>剩余场次</Text>
+            </View>
+          </View>
+        )}
+
         <View className={styles.tabList}>
           {rounds.map(round => (
             <View
               key={round}
               className={`${styles.tabItem} ${activeRound === round ? styles.tabItemActive : ''}`}
-              onClick={() => setActiveRound(round)}
+              onClick={() => handleRoundChange(round)}
             >
               <Text className={`${styles.tabText} ${activeRound === round ? styles.tabTextActive : ''}`}>
                 {getRoundName(round, maxRound)}

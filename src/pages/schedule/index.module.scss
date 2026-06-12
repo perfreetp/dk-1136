@@ -26,6 +26,42 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+.progressSection {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-md;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+  margin-top: $spacing-md;
+}
+
+.progressItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.progressValue {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.progressLabel {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4rpx;
+}
+
+.progressDivider {
+  width: 1rpx;
+  height: 48rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 .tabList {
   display: flex;
   flex-direction: row;

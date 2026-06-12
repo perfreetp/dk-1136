@@ -262,97 +262,151 @@ export const generateMatches = (eventId: string): Match[] => {
   const signedInTeams = getSignedInTeams(eventId);
   const event = unifiedData.events[eventId];
   if (!event || signedInTeams.length < 2) return [];
-  
+
+  const existingMatches = unifiedData.matches[eventId] || [];
+  const hasFinishedMatches = existingMatches.some(m => m.status === 'finished' && m.team2Name !== '轮空');
+
+  if (hasFinishedMatches && !canRegenerateMatches(eventId)) {
+    return existingMatches;
+  }
+
   const matches: Match[] = [];
   const teamCount = signedInTeams.length;
   const matchCount = Math.floor(teamCount / 2);
-  
+
   for (let i = 0; i < matchCount; i++) {
     const team1 = signedInTeams[i * 2];
     const team2 = signedInTeams[i * 2 + 1];
-    matches.push({
-      id: `m_${eventId}_${i + 1}`,
-      eventId,
-      round: 1,
-      matchNumber: i + 1,
-      team1Id: team1.id,
-      team1Name: team1.name,
-      team1Avatar: team1.avatar,
-      team2Id: team2.id,
-      team2Name: team2.name,
-      team2Avatar: team2.avatar,
-      status: 'pending',
-      startTime: event.info.startTime
-    });
+
+    const existingMatch = existingMatches.find(m =>
+      m.round === 1 &&
+      m.matchNumber === i + 1 &&
+      m.team1Id === team1.id &&
+      m.team2Id === team2.id
+    );
+
+    if (existingMatch) {
+      matches.push(existingMatch);
+    } else {
+      matches.push({
+        id: `m_${eventId}_${i + 1}`,
+        eventId,
+        round: 1,
+        matchNumber: i + 1,
+        team1Id: team1.id,
+        team1Name: team1.name,
+        team1Avatar: team1.avatar,
+        team2Id: team2.id,
+        team2Name: team2.name,
+        team2Avatar: team2.avatar,
+        status: 'pending',
+        startTime: event.info.startTime
+      });
+    }
   }
-  
+
   if (teamCount % 2 === 1) {
     const byeTeam = signedInTeams[teamCount - 1];
-    matches.push({
-      id: `m_${eventId}_bye`,
-      eventId,
-      round: 1,
-      matchNumber: matchCount + 1,
-      team1Id: byeTeam.id,
-      team1Name: byeTeam.name,
-      team1Avatar: byeTeam.avatar,
-      team2Id: '',
-      team2Name: '轮空',
-      team2Avatar: '',
-      status: 'finished',
-      score1: 1,
-      score2: 0,
-      winnerId: byeTeam.id,
-      startTime: event.info.startTime
-    });
+
+    const existingByeMatch = existingMatches.find(m =>
+      m.round === 1 &&
+      m.team2Name === '轮空' &&
+      m.team1Id === byeTeam.id
+    );
+
+    if (existingByeMatch) {
+      matches.push(existingByeMatch);
+    } else {
+      matches.push({
+        id: `m_${eventId}_bye`,
+        eventId,
+        round: 1,
+        matchNumber: matchCount + 1,
+        team1Id: byeTeam.id,
+        team1Name: byeTeam.name,
+        team1Avatar: byeTeam.avatar,
+        team2Id: '',
+        team2Name: '轮空',
+        team2Avatar: '',
+        status: 'finished',
+        score1: 1,
+        score2: 0,
+        winnerId: byeTeam.id,
+        startTime: event.info.startTime
+      });
+    }
   }
-  
+
   unifiedData.matches[eventId] = matches;
   saveUnifiedData();
   return matches;
 };
 
-export const submitScore = (eventId: string, matchId: string, score1: number, score2: number): Match | null => {
+export const submitScore = (eventId: string, matchId: string, score1: number, score2: number): { success: boolean; match?: Match; error?: string } => {
   const matches = unifiedData.matches[eventId];
-  if (!matches) return null;
-  
+  if (!matches) return { success: false, error: '比赛数据不存在' };
+
   const matchIndex = matches.findIndex(m => m.id === matchId);
-  if (matchIndex === -1) return null;
-  
+  if (matchIndex === -1) return { success: false, error: '比赛不存在' };
+
   const match = matches[matchIndex];
+
+  if (match.team2Name === '轮空') {
+    return { success: false, error: '轮空比赛无需提交比分' };
+  }
+
+  if (score1 === undefined || score1 === null || score2 === undefined || score2 === null) {
+    return { success: false, error: '请输入完整比分' };
+  }
+
+  if (isNaN(score1) || isNaN(score2) || score1 < 0 || score2 < 0) {
+    return { success: false, error: '请输入有效的比分' };
+  }
+
+  if (score1 === score2) {
+    return { success: false, error: '比赛不能有平局，请重新提交' };
+  }
+
+  if (match.status === 'finished') {
+    return { success: false, error: '该比赛已结束' };
+  }
+
   match.score1 = score1;
   match.score2 = score2;
   match.status = 'finished';
   match.winnerId = score1 > score2 ? match.team1Id : match.team2Id;
-  
+
   generateNextRound(eventId);
   saveUnifiedData();
-  return match;
+  return { success: true, match };
 };
 
 const generateNextRound = (eventId: string) => {
   const matches = unifiedData.matches[eventId];
   if (!matches) return;
-  
+
   const currentRound = Math.max(...matches.map(m => m.round));
-  const finishedMatches = matches.filter(m => m.round === currentRound && m.status === 'finished');
-  
-  if (finishedMatches.length === 0) return;
-  
+  const currentRoundMatches = matches.filter(m => m.round === currentRound && m.team2Name !== '轮空');
+  const finishedMatches = matches.filter(m => m.round === currentRound && m.status === 'finished' && m.team2Name !== '轮空');
+
+  if (finishedMatches.length < currentRoundMatches.length) {
+    return;
+  }
+
   const nextRoundWinners = finishedMatches.map(m => ({
     id: m.winnerId!,
     name: m.winnerId === m.team1Id ? m.team1Name : m.team2Name,
     avatar: m.winnerId === m.team1Id ? m.team1Avatar : m.team2Avatar
   }));
-  
+
   if (nextRoundWinners.length < 2) return;
-  
+
   const nextRound = currentRound + 1;
-  
+
   for (let i = 0; i < Math.floor(nextRoundWinners.length / 2); i++) {
     const team1 = nextRoundWinners[i * 2];
     const team2 = nextRoundWinners[i * 2 + 1];
-    
+
     const existingMatch = matches.find(m => m.round === nextRound && m.matchNumber === i + 1);
     if (!existingMatch) {
       matches.push({
@@ -371,7 +425,7 @@ const generateNextRound = (eventId: string) => {
       });
     }
   }
-  
+
   if (nextRoundWinners.length % 2 === 1) {
     const byeWinner = nextRoundWinners[nextRoundWinners.length - 1];
     matches.push({
@@ -436,23 +490,52 @@ export const clearMatches = (eventId: string): void => {
   }
 };
 
-export const getMatchProgress = (eventId: string): { finished: number; total: number; currentRound: number; maxRound: number } => {
+export const getMatchProgress = (eventId: string): {
+  finished: number;
+  total: number;
+  remaining: number;
+  currentRound: number;
+  maxRound: number;
+  currentRoundName: string;
+  totalRounds: number;
+} => {
   const matches = unifiedData.matches[eventId] || [];
+
   if (matches.length === 0) {
-    return { finished: 0, total: 0, currentRound: 0, maxRound: 0 };
+    return {
+      finished: 0,
+      total: 0,
+      remaining: 0,
+      currentRound: 0,
+      maxRound: 0,
+      currentRoundName: '等待对阵',
+      totalRounds: 0
+    };
   }
 
-  const finishedMatches = matches.filter(m => m.status === 'finished' && m.team2Name !== '轮空');
+  const validMatches = matches.filter(m => m.team2Name !== '轮空');
+  const finishedMatches = validMatches.filter(m => m.status === 'finished');
+  const pendingMatches = validMatches.filter(m => m.status !== 'finished');
+
   const maxRound = Math.max(...matches.map(m => m.round));
-  const currentRound = matches.filter(m => m.status !== 'finished' && m.team2Name !== '轮空').length > 0
-    ? matches.filter(m => m.status === 'finished' && m.team2Name !== '轮空').length + 1
+  const totalRounds = maxRound;
+
+  const currentRound = pendingMatches.length > 0
+    ? Math.min(...pendingMatches.map(m => m.round))
     : maxRound;
+
+  const currentRoundMatches = validMatches.filter(m => m.round === currentRound);
+  const currentRoundFinished = currentRoundMatches.filter(m => m.status === 'finished').length;
+  const currentRoundRemaining = currentRoundMatches.length - currentRoundFinished;
 
   return {
     finished: finishedMatches.length,
-    total: matches.filter(m => m.team2Name !== '轮空').length,
-    currentRound: Math.min(currentRound, maxRound),
-    maxRound
+    total: validMatches.length,
+    remaining: pendingMatches.length,
+    currentRound: currentRound,
+    maxRound: totalRounds,
+    currentRoundName: getRoundName(currentRound, totalRounds),
+    totalRounds
   };
 };
 
