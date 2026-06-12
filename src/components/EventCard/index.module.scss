@@ -1,0 +1,184 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  display: flex;
+  flex-direction: row;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.left {
+  width: 120rpx;
+  height: 120rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.gameIcon {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-sm;
+  background-color: $color-bg-hover;
+}
+
+.right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.title {
+  flex: 1;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  margin-right: $spacing-sm;
+}
+
+.status {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.statusPending {
+  background-color: rgba($color-warning, 0.1);
+  
+  .statusText {
+    color: $color-warning;
+  }
+}
+
+.statusOngoing {
+  background-color: rgba($color-primary, 0.1);
+  
+  .statusText {
+    color: $color-primary;
+  }
+}
+
+.statusFinished {
+  background-color: rgba($color-success, 0.1);
+  
+  .statusText {
+    color: $color-success;
+  }
+}
+
+.statusCancelled {
+  background-color: rgba($color-text-tertiary, 0.1);
+  
+  .statusText {
+    color: $color-text-tertiary;
+  }
+}
+
+.statusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.infoText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.infoDot {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin: 0 $spacing-xs;
+}
+
+.footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.tags {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-xs;
+}
+
+.tag {
+  padding: 4rpx 12rpx;
+  background-color: $color-tag-bg;
+  border-radius: $radius-xs;
+}
+
+.tagText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+}
+
+.teamInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+
+.teamCount {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.teamLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: 4rpx;
+}
+
+.priceRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.priceLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-right: $spacing-xs;
+}
+
+.priceValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+}
+
+.freeTag {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+}

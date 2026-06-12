@@ -1,0 +1,199 @@
+@use '@/styles/variables.scss' as *;
+
+.homePage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding: 0 $page-padding;
+  padding-bottom: $spacing-xl;
+}
+
+.searchBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: $color-bg-hover;
+  border-radius: $radius-round;
+  padding: $spacing-sm $spacing-md;
+  margin-top: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.searchIcon {
+  font-size: $font-size-lg;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.searchInput {
+  flex: 1;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.searchPlaceholder {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.categorySection {
+  margin-bottom: $spacing-lg;
+}
+
+.categoryScroll {
+  @include scroll-x-container;
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-sm;
+}
+
+.categoryItem {
+  @include scroll-x-item(auto);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-sm $spacing-lg;
+  background-color: $color-bg-card;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.categoryItemActive {
+  background-color: $color-primary;
+  border-color: $color-primary;
+}
+
+.categoryText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.categoryTextActive {
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.hotSection {
+  margin-bottom: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.sectionMore {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.hotBanner {
+  height: 280rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: $spacing-md;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 280rpx;
+}
+
+.bannerOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: $spacing-md;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.bannerTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.bannerInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.bannerText {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.bannerDot {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0 $spacing-xs;
+}
+
+.hotList {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-md;
+}
+
+.hotScroll {
+  @include scroll-x-container;
+}
+
+.hotCard {
+  @include scroll-x-item(320rpx);
+  display: inline-flex;
+  flex-direction: column;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.hotCardTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis-multi(1);
+  margin-bottom: $spacing-xs;
+}
+
+.hotCardGame {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.hotCardPrize {
+  font-size: $font-size-sm;
+  color: $color-gold;
+  font-weight: $font-weight-medium;
+}
+
+.eventSection {
+  margin-top: $spacing-lg;
+}
+
+.eventList {
+  margin-top: $spacing-md;
+}

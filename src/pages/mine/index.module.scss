@@ -1,0 +1,268 @@
+@use '@/styles/variables.scss' as *;
+
+.minePage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+}
+
+.headerSection {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  padding: $spacing-xl $page-padding;
+  padding-top: $spacing-lg;
+}
+
+.userInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin-right: $spacing-md;
+}
+
+.userName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+  margin-bottom: $spacing-xs;
+}
+
+.userRole {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.roleTag {
+  padding: 4rpx 16rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: $radius-xs;
+}
+
+.roleText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+}
+
+.statsSection {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: $radius-md;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-white;
+}
+
+.statLabel {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: $spacing-xs;
+}
+
+.contentSection {
+  padding: 0 $page-padding;
+  margin-top: $spacing-md;
+}
+
+.sectionCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.cardTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.cardAction {
+  font-size: $font-size-sm;
+  color: $color-primary;
+}
+
+.teamList {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-md;
+}
+
+.teamItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-sm;
+}
+
+.teamAvatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-round;
+  background-color: $color-bg-hover;
+  margin-bottom: $spacing-xs;
+}
+
+.teamName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  max-width: 120rpx;
+}
+
+.menuSection {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  box-shadow: $shadow-card;
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1rpx solid $color-divider;
+  transition: all $transition-base;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    background-color: $color-bg-hover;
+  }
+}
+
+.menuLeft {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.menuIcon {
+  font-size: $font-size-xl;
+  margin-right: $spacing-md;
+}
+
+.menuText {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.menuArrow {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.notificationBadge {
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: $radius-round;
+  background-color: $color-error;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: $spacing-sm;
+}
+
+.badgeText {
+  font-size: $font-size-xs;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.historySection {
+  margin-top: $spacing-md;
+}
+
+.historyItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: $spacing-md;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+  box-shadow: $shadow-card;
+}
+
+.historyIcon {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: $radius-sm;
+  background-color: $color-bg-hover;
+  margin-right: $spacing-md;
+}
+
+.historyContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.historyTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.historyTime {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
+}
+
+.historyResult {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.resultWin {
+  background-color: rgba($color-success, 0.1);
+  
+  .resultText {
+    color: $color-success;
+  }
+}
+
+.resultLose {
+  background-color: rgba($color-error, 0.1);
+  
+  .resultText {
+    color: $color-error;
+  }
+}
+
+.resultText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
