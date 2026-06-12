@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, ScrollView } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { mockTeams, mockHistory } from '@/data/teams';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { getTeams, mockHistory } from '@/data/teams';
 import { getUnreadCount } from '@/data/notifications';
 import styles from './index.module.scss';
 
 const MinePage: React.FC = () => {
-  const unreadCount = getUnreadCount();
+  const [teams, setTeams] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useDidShow(() => {
+    setTeams([...getTeams()]);
+    setHistory([...mockHistory]);
+    setUnreadCount(getUnreadCount());
+  });
 
   const handleMenuClick = (type: string) => {
     switch (type) {
@@ -33,6 +41,8 @@ const MinePage: React.FC = () => {
     }
   };
 
+  const winCount = history.filter(h => h.result === 'win').length;
+
   return (
     <View className={styles.minePage}>
       <View className={styles.headerSection}>
@@ -57,15 +67,15 @@ const MinePage: React.FC = () => {
 
         <View className={styles.statsSection}>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{mockHistory.length}</Text>
+            <Text className={styles.statValue}>{history.length}</Text>
             <Text className={styles.statLabel}>参与赛事</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{mockTeams.length}</Text>
+            <Text className={styles.statValue}>{teams.length}</Text>
             <Text className={styles.statLabel}>我的战队</Text>
           </View>
           <View className={styles.statItem}>
-            <Text className={styles.statValue}>{mockHistory.filter(h => h.result === 'win').length}</Text>
+            <Text className={styles.statValue}>{winCount}</Text>
             <Text className={styles.statLabel}>获胜场次</Text>
           </View>
         </View>
@@ -81,7 +91,7 @@ const MinePage: React.FC = () => {
           </View>
           <ScrollView scrollX>
             <View className={styles.teamList}>
-              {mockTeams.slice(0, 3).map((team) => (
+              {teams.slice(0, 3).map((team) => (
                 <View key={team.id} className={styles.teamItem} onClick={() => handleMenuClick('team')}>
                   <Image 
                     src={team.avatar}
@@ -92,7 +102,7 @@ const MinePage: React.FC = () => {
                 </View>
               ))}
               <View className={styles.teamItem} onClick={() => handleMenuClick('team')}>
-                <View className={styles.teamAvatar} style={{ backgroundColor: '$color-primary' }}>
+                <View className={styles.teamAvatar} style={{ backgroundColor: '#6366F1' }}>
                   <Text style={{ color: '#fff', fontSize: '40rpx' }}>+</Text>
                 </View>
                 <Text className={styles.teamName}>创建战队</Text>
@@ -108,7 +118,7 @@ const MinePage: React.FC = () => {
               查看全部
             </Text>
           </View>
-          {mockHistory.slice(0, 3).map((record) => (
+          {history.slice(0, 3).map((record) => (
             <View key={record.id} className={styles.historyItem} onClick={() => handleMenuClick('history')}>
               <Image 
                 src={record.gameIcon}

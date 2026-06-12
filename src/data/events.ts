@@ -1,4 +1,5 @@
-import { Event, Team, Match } from '@/types';
+import { Event, Team, Match, Notification, Contact, Rating, HistoryRecord } from '@/types';
+import { storage, STORAGE_KEYS } from '@/utils/storage';
 
 export const mockEvents: Event[] = [
   {
@@ -12,7 +13,7 @@ export const mockEvents: Event[] = [
     entryFee: 50,
     prize: '冠军500元+网费200 | 亚军300元+网费100',
     maxTeams: 16,
-    currentTeams: 12,
+    currentTeams: 0,
     status: 'pending',
     tags: ['新手友好', '5v5'],
     description: '欢迎各路召唤师前来挑战！比赛采用淘汰制，每局BO1，决赛BO3。',
@@ -34,7 +35,7 @@ export const mockEvents: Event[] = [
     entryFee: 30,
     prize: '冠军300元网费 | 亚军150元网费',
     maxTeams: 8,
-    currentTeams: 8,
+    currentTeams: 0,
     status: 'ongoing',
     tags: ['新人专属', '5v5'],
     description: '专为新手设计的比赛，欢迎0-10级玩家参加！',
@@ -56,7 +57,7 @@ export const mockEvents: Event[] = [
     entryFee: 0,
     prize: '参与即送50元网费',
     maxTeams: 12,
-    currentTeams: 6,
+    currentTeams: 0,
     status: 'pending',
     tags: ['免费', '娱乐赛'],
     description: '纯娱乐性质比赛，重在参与，欢乐为主！',
@@ -78,7 +79,7 @@ export const mockEvents: Event[] = [
     entryFee: 80,
     prize: '冠军800元+外设礼包 | 亚军400元',
     maxTeams: 16,
-    currentTeams: 16,
+    currentTeams: 0,
     status: 'ongoing',
     tags: ['高奖金', '竞技'],
     description: '高水平竞技比赛，邀请各路高手参与！',
@@ -100,7 +101,7 @@ export const mockEvents: Event[] = [
     entryFee: 40,
     prize: '冠军400元 | 亚军200元',
     maxTeams: 20,
-    currentTeams: 15,
+    currentTeams: 0,
     status: 'pending',
     tags: ['四排', '吃鸡'],
     description: '四排模式，积分制，共进行5场比赛！',
@@ -122,7 +123,7 @@ export const mockEvents: Event[] = [
     entryFee: 60,
     prize: '冠军情侣套餐+300元 | 亚军情侣套餐',
     maxTeams: 16,
-    currentTeams: 10,
+    currentTeams: 0,
     status: 'pending',
     tags: ['情侣', '双排'],
     description: '情人节特别赛事，情侣组队参加！',
@@ -144,7 +145,7 @@ export const mockEvents: Event[] = [
     entryFee: 50,
     prize: '冠军500元 | 亚军250元',
     maxTeams: 12,
-    currentTeams: 8,
+    currentTeams: 0,
     status: 'pending',
     tags: ['周末', '竞技'],
     description: '周末狂欢，无畏契约等你来战！',
@@ -166,7 +167,7 @@ export const mockEvents: Event[] = [
     entryFee: 20,
     prize: '冠军200元+专属皮肤 | 亚军100元',
     maxTeams: 8,
-    currentTeams: 4,
+    currentTeams: 0,
     status: 'pending',
     tags: ['老玩家', '回归'],
     description: '欢迎老玩家回归，重温DOTA2经典！',
@@ -188,7 +189,7 @@ export const mockEvents: Event[] = [
     entryFee: 0,
     prize: '参与即送30元网费',
     maxTeams: 10,
-    currentTeams: 7,
+    currentTeams: 0,
     status: 'pending',
     tags: ['免费', '新手'],
     description: '新手专属，专业教练指导！',
@@ -210,7 +211,7 @@ export const mockEvents: Event[] = [
     entryFee: 30,
     prize: '冠军300元 | 亚军150元',
     maxTeams: 20,
-    currentTeams: 18,
+    currentTeams: 0,
     status: 'pending',
     tags: ['综合', '娱乐'],
     description: '多种游戏轮番上阵，综合积分制！',
@@ -223,42 +224,116 @@ export const mockEvents: Event[] = [
   }
 ];
 
-export const hotEvents = mockEvents.filter(e => e.status === 'ongoing' || e.currentTeams >= 10).slice(0, 3);
+export const hotEvents = mockEvents.filter(e => e.status === 'ongoing' || e.currentTeams >= 5).slice(0, 3);
 
-export const registeredTeams: Record<string, Team[]> = {
-  '1': [
-    { id: 't1', name: '无敌战队', avatar: 'https://picsum.photos/id/1/200/200', memberCount: 5, maxMembers: 5, captainId: 'u1', captainName: '小明', members: [{ id: 'u1', name: '小明', avatar: 'https://picsum.photos/id/64/100/100', role: 'captain' }, { id: 'u2', name: '阿杰', avatar: 'https://picsum.photos/id/91/100/100', role: 'member' }], createdAt: '2024-01-10' },
-    { id: 't2', name: '王者归来', avatar: 'https://picsum.photos/id/2/200/200', memberCount: 5, maxMembers: 5, captainId: 'u2', captainName: '阿杰', members: [{ id: 'u2', name: '阿杰', avatar: 'https://picsum.photos/id/91/100/100', role: 'captain' }], createdAt: '2024-01-12' },
-    { id: 't3', name: '绝地求生', avatar: 'https://picsum.photos/id/3/200/200', memberCount: 5, maxMembers: 5, captainId: 'u3', captainName: '大壮', members: [], createdAt: '2024-01-15' },
-    { id: 't4', name: '星辰大海', avatar: 'https://picsum.photos/id/6/200/200', memberCount: 5, maxMembers: 5, captainId: 'u4', captainName: '小王', members: [], createdAt: '2024-01-18' },
-    { id: 't5', name: '电竞新秀', avatar: 'https://picsum.photos/id/8/200/200', memberCount: 4, maxMembers: 5, captainId: 'u5', captainName: '阿强', members: [], createdAt: '2024-01-20' },
-  ],
-  '2': [
-    { id: 't6', name: '无畏先锋', avatar: 'https://picsum.photos/id/119/200/200', memberCount: 5, maxMembers: 5, captainId: 'u6', captainName: '小刚', members: [], createdAt: '2024-01-19' },
-    { id: 't7', name: '特战精英', avatar: 'https://picsum.photos/id/160/200/200', memberCount: 5, maxMembers: 5, captainId: 'u7', captainName: '阿华', members: [], createdAt: '2024-01-19' },
-  ]
+let registeredTeamsMap: Record<string, Team[]> = storage.get(STORAGE_KEYS.REGISTERED_TEAMS) || {};
+let matchesMap: Record<string, Match[]> = storage.get(STORAGE_KEYS.MATCHES) || {};
+
+export const getRegisteredTeams = (eventId: string): Team[] => {
+  return registeredTeamsMap[eventId] || [];
 };
 
-export const mockMatches: Record<string, Match[]> = {
-  '2': [
-    { id: 'm1', eventId: '2', round: 1, matchNumber: 1, team1Id: 't6', team1Name: '无畏先锋', team1Avatar: 'https://picsum.photos/id/119/200/200', team2Id: 't7', team2Name: '特战精英', team2Avatar: 'https://picsum.photos/id/160/200/200', score1: 13, score2: 8, status: 'finished', startTime: '2024-01-21 15:00', winnerId: 't6' },
-    { id: 'm2', eventId: '2', round: 2, matchNumber: 1, team1Id: 't6', team1Name: '无畏先锋', team1Avatar: 'https://picsum.photos/id/119/200/200', team2Id: 't8', team2Name: '待定', team2Avatar: '', status: 'pending', startTime: '2024-01-21 17:00' },
-  ],
-  '4': [
-    { id: 'm3', eventId: '4', round: 1, matchNumber: 1, team1Id: 't9', team1Name: '狙击之王', team1Avatar: 'https://picsum.photos/id/201/200/200', team2Id: 't10', team2Name: '反恐精英', team2Avatar: 'https://picsum.photos/id/1/200/200', score1: 16, score2: 14, status: 'finished', startTime: '2024-01-23 13:00', winnerId: 't9' },
-    { id: 'm4', eventId: '4', round: 1, matchNumber: 2, team1Id: 't11', team1Name: '暗影战队', team1Avatar: 'https://picsum.photos/id/2/200/200', team2Id: 't12', team2Name: '烈焰之魂', team2Avatar: 'https://picsum.photos/id/3/200/200', score1: 9, score2: 16, status: 'finished', startTime: '2024-01-23 13:00', winnerId: 't12' },
-    { id: 'm5', eventId: '4', round: 2, matchNumber: 1, team1Id: 't9', team1Name: '狙击之王', team1Avatar: 'https://picsum.photos/id/201/200/200', team2Id: 't12', team2Name: '烈焰之魂', team2Avatar: 'https://picsum.photos/id/3/200/200', status: 'ongoing', startTime: '2024-01-23 16:00' },
-  ]
+export const addRegisteredTeam = (eventId: string, team: Team): void => {
+  if (!registeredTeamsMap[eventId]) {
+    registeredTeamsMap[eventId] = [];
+  }
+  const exists = registeredTeamsMap[eventId].some(t => t.id === team.id);
+  if (!exists) {
+    registeredTeamsMap[eventId].push(team);
+    const event = mockEvents.find(e => e.id === eventId);
+    if (event) {
+      event.currentTeams = registeredTeamsMap[eventId].length;
+    }
+    storage.set(STORAGE_KEYS.REGISTERED_TEAMS, registeredTeamsMap);
+  }
+};
+
+export const isTeamRegistered = (eventId: string, teamId: string): boolean => {
+  const teams = registeredTeamsMap[eventId] || [];
+  return teams.some(t => t.id === teamId);
+};
+
+export const getMatches = (eventId: string): Match[] => {
+  return matchesMap[eventId] || [];
+};
+
+export const setMatches = (eventId: string, matches: Match[]): void => {
+  matchesMap[eventId] = matches;
+  storage.set(STORAGE_KEYS.MATCHES, matchesMap);
+};
+
+export const updateMatch = (eventId: string, matchId: string, updates: Partial<Match>): void => {
+  if (matchesMap[eventId]) {
+    matchesMap[eventId] = matchesMap[eventId].map(m => 
+      m.id === matchId ? { ...m, ...updates } : m
+    );
+    storage.set(STORAGE_KEYS.MATCHES, matchesMap);
+  }
+};
+
+export const generateFirstRoundMatches = (eventId: string): Match[] => {
+  const teams = registeredTeamsMap[eventId] || [];
+  if (teams.length < 2) return [];
+
+  const matches: Match[] = [];
+  const teamCount = teams.length;
+  const matchCount = Math.floor(teamCount / 2);
+
+  for (let i = 0; i < matchCount; i++) {
+    const team1 = teams[i * 2];
+    const team2 = teams[i * 2 + 1];
+    
+    matches.push({
+      id: `m_${eventId}_${i + 1}`,
+      eventId,
+      round: 1,
+      matchNumber: i + 1,
+      team1Id: team1.id,
+      team1Name: team1.name,
+      team1Avatar: team1.avatar,
+      team2Id: team2.id,
+      team2Name: team2.name,
+      team2Avatar: team2.avatar,
+      status: 'pending',
+      startTime: mockEvents.find(e => e.id === eventId)?.startTime || ''
+    });
+  }
+
+  if (teamCount % 2 === 1) {
+    const byeTeam = teams[teamCount - 1];
+    matches.push({
+      id: `m_${eventId}_bye`,
+      eventId,
+      round: 1,
+      matchNumber: matchCount + 1,
+      team1Id: byeTeam.id,
+      team1Name: byeTeam.name,
+      team1Avatar: byeTeam.avatar,
+      team2Id: '',
+      team2Name: '轮空',
+      team2Avatar: '',
+      status: 'finished',
+      score1: 1,
+      score2: 0,
+      winnerId: byeTeam.id,
+      startTime: mockEvents.find(e => e.id === eventId)?.startTime || ''
+    });
+  }
+
+  matchesMap[eventId] = matches;
+  storage.set(STORAGE_KEYS.MATCHES, matchesMap);
+  return matches;
 };
 
 export const getEventById = (id: string): Event | undefined => {
   return mockEvents.find(e => e.id === id);
 };
 
-export const getRegisteredTeams = (eventId: string): Team[] => {
-  return registeredTeams[eventId] || [];
-};
-
-export const getMatches = (eventId: string): Match[] => {
-  return mockMatches[eventId] || [];
+export const updateEventTeams = (eventId: string): number => {
+  const teams = registeredTeamsMap[eventId] || [];
+  const event = mockEvents.find(e => e.id === eventId);
+  if (event) {
+    event.currentTeams = teams.length;
+  }
+  return teams.length;
 };

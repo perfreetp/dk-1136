@@ -1,6 +1,17 @@
 import { Notification } from '@/types';
+import { storage, STORAGE_KEYS } from '@/utils/storage';
 
-export const mockNotifications: Notification[] = [
+interface Dispute {
+  id: string;
+  matchId: string;
+  eventId: string;
+  reason: string;
+  status: 'pending' | 'resolved';
+  result?: string;
+  time: string;
+}
+
+let notifications: Notification[] = storage.get(STORAGE_KEYS.NOTIFICATIONS) || [
   {
     id: 'n1',
     type: 'event',
@@ -73,17 +84,72 @@ export const mockNotifications: Notification[] = [
   }
 ];
 
-export const getUnreadCount = (): number => {
-  return mockNotifications.filter(n => !n.isRead).length;
-};
+let disputes: Dispute[] = storage.get(STORAGE_KEYS.DISPUTES) || [];
 
-export const getNotifications = (): Notification[] => {
-  return mockNotifications;
+export const getNotifications = (): Notification[] => notifications;
+
+export const addNotification = (notification: Notification): void => {
+  notifications.unshift(notification);
+  storage.set(STORAGE_KEYS.NOTIFICATIONS, notifications);
 };
 
 export const markAsRead = (id: string): void => {
-  const notification = mockNotifications.find(n => n.id === id);
+  const notification = notifications.find(n => n.id === id);
   if (notification) {
     notification.isRead = true;
+    storage.set(STORAGE_KEYS.NOTIFICATIONS, notifications);
+  }
+};
+
+export const markAllAsRead = (): void => {
+  notifications = notifications.map(n => ({ ...n, isRead: true }));
+  storage.set(STORAGE_KEYS.NOTIFICATIONS, notifications);
+};
+
+export const getUnreadCount = (): number => {
+  return notifications.filter(n => !n.isRead).length;
+};
+
+export const submitDispute = (matchId: string, eventId: string, reason: string): void => {
+  const dispute: Dispute = {
+    id: `d_${Date.now()}`,
+    matchId,
+    eventId,
+    reason,
+    status: 'pending',
+    time: new Date().toISOString().replace('T', ' ').substring(0, 16)
+  };
+  disputes.push(dispute);
+  storage.set(STORAGE_KEYS.DISPUTES, disputes);
+
+  const notification: Notification = {
+    id: `n_${Date.now()}`,
+    type: 'match',
+    title: '裁决申请已提交',
+    content: `您的裁决申请已提交，请等待处理结果。`,
+    time: '刚刚',
+    isRead: false,
+    eventId
+  };
+  addNotification(notification);
+};
+
+export const resolveDispute = (disputeId: string, result: string): void => {
+  const dispute = disputes.find(d => d.id === disputeId);
+  if (dispute) {
+    dispute.status = 'resolved';
+    dispute.result = result;
+    storage.set(STORAGE_KEYS.DISPUTES, disputes);
+
+    const notification: Notification = {
+      id: `n_${Date.now()}`,
+      type: 'match',
+      title: '裁决结果通知',
+      content: `您的裁决申请已处理，结果：${result}`,
+      time: '刚刚',
+      isRead: false,
+      eventId: dispute.eventId
+    };
+    addNotification(notification);
   }
 };

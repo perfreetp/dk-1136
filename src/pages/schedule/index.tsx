@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { Match } from '@/types';
-import { getMatches, mockEvents, registeredTeams } from '@/data/events';
+import { getMatches, getEventById, updateMatch, generateFirstRoundMatches, getRegisteredTeams } from '@/data/events';
+import { submitDispute } from '@/data/notifications';
 import styles from './index.module.scss';
 
 const SchedulePage: React.FC = () => {
   const [eventId, setEventId] = useState<string | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<typeof mockEvents[0] | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [activeRound, setActiveRound] = useState(1);
   const [showScoreModal, setShowScoreModal] = useState(false);
@@ -21,20 +22,38 @@ const SchedulePage: React.FC = () => {
     const params = Taro.getCurrentInstance()?.router?.params;
     if (params?.id) {
       setEventId(params.id);
-      const event = mockEvents.find(e => e.id === params.id);
-      if (event) {
-        setSelectedEvent(event);
-        const eventMatches = getMatches(params.id);
-        setMatches(eventMatches);
-        if (eventMatches.length > 0) {
-          setActiveRound(eventMatches[0].round);
-        }
-      }
+      loadEventData(params.id);
     }
   }, []);
 
-  const rounds = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
+  useDidShow(() => {
+    if (eventId) {
+      loadEventData(eventId);
+    }
+  });
 
+  const loadEventData = (id: string) => {
+    const event = getEventById(id);
+    if (event) {
+      setSelectedEvent(event);
+      let eventMatches = getMatches(id);
+      
+      if (eventMatches.length === 0) {
+        const registeredTeams = getRegisteredTeams(id);
+        if (registeredTeams.length >= 2) {
+          eventMatches = generateFirstRoundMatches(id);
+        }
+      }
+      
+      setMatches(eventMatches);
+      if (eventMatches.length > 0) {
+        const maxRound = Math.max(...eventMatches.map(m => m.round));
+        setActiveRound(1);
+      }
+    }
+  };
+
+  const rounds = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
   const currentRoundMatches = matches.filter(m => m.round === activeRound);
 
   const getRoundName = (round: number) => {
@@ -55,11 +74,8 @@ const SchedulePage: React.FC = () => {
   };
 
   const handleScoreSubmit = () => {
-    if (!selectedMatch || !score1 || !score2) {
-      Taro.showToast({ title: '请输入比分', icon: 'none' });
-      return;
-    }
-
+    if (!selectedMatch || !eventId) return;
+    
     const s1 = parseInt(score1);
     const s2 = parseInt(score2);
 
@@ -68,21 +84,16 @@ const SchedulePage: React.FC = () => {
       return;
     }
 
-    const updatedMatches = matches.map(m => {
-      if (m.id === selectedMatch.id) {
-        const winner = s1 > s2 ? m.team1Id : m.team2Id;
-        return {
-          ...m,
-          score1: s1,
-          score2: s2,
-          status: 'finished' as const,
-          winnerId: winner
-        };
-      }
-      return m;
+    const winner = s1 > s2 ? selectedMatch.team1Id : selectedMatch.team2Id;
+    
+    updateMatch(eventId, selectedMatch.id, {
+      score1: s1,
+      score2: s2,
+      status: 'finished',
+      winnerId: winner
     });
 
-    setMatches(updatedMatches);
+    loadEventData(eventId);
     setShowScoreModal(false);
     setScore1('');
     setScore2('');
@@ -90,16 +101,12 @@ const SchedulePage: React.FC = () => {
   };
 
   const handleDisputeSubmit = () => {
-    if (!disputeReason.trim()) {
+    if (!disputeReason.trim() || !selectedMatch || !eventId) {
       Taro.showToast({ title: '请输入申诉原因', icon: 'none' });
       return;
     }
 
-    console.log('[Schedule] 提交裁决申请:', {
-      matchId: selectedMatch?.id,
-      reason: disputeReason
-    });
-
+    submitDispute(selectedMatch.id, eventId, disputeReason);
     setShowDisputeModal(false);
     setDisputeReason('');
     Taro.showToast({ title: '裁决申请已提交', icon: 'success' });
@@ -130,6 +137,7 @@ const SchedulePage: React.FC = () => {
   }
 
   if (matches.length === 0) {
+    const registeredTeams = getRegisteredTeams(eventId);
     return (
       <View className={styles.schedulePage}>
         <View className={styles.header}>
@@ -140,8 +148,24 @@ const SchedulePage: React.FC = () => {
         </View>
         <View className={styles.placeholderSection}>
           <Text className={styles.placeholderIcon}>⏳</Text>
-          <Text className={styles.placeholderTitle}>对阵表生成中</Text>
-          <Text className={styles.placeholderDesc}>请耐心等待，赛事开始前会自动生成对阵表</Text>
+          <Text className={styles.placeholderTitle}>
+            {registeredTeams.length < 2 ? '等待更多队伍报名' : '对阵表生成中'}
+          </Text>
+          <Text className={styles.placeholderDesc}>
+            {registeredTeams.length < 2 
+              ? `当前 ${registeredTeams.length} 队报名，至少需要 2 队才能生成对阵` 
+              : '请耐心等待，系统正在生成对阵表'}
+          </Text>
+          {registeredTeams.length > 0 && (
+            <View style={{ marginTop: '32rpx' }}>
+              <Text style={{ color: '#94A3B8', fontSize: '24rpx' }}>已报名队伍：</Text>
+              {registeredTeams.map((team, index) => (
+                <Text key={index} style={{ color: '#6366F1', fontSize: '24rpx', marginTop: '8rpx' }}>
+                  {index + 1}. {team.name}
+                </Text>
+              ))}
+            </View>
+          )}
         </View>
       </View>
     );
@@ -226,30 +250,20 @@ const SchedulePage: React.FC = () => {
                   </View>
                 )}
 
-                {match.status === 'ongoing' && (
-                  <View className={styles.matchActions}>
-                    <View 
-                      className={`${styles.actionBtn} ${styles.scoreBtn}`}
-                      onClick={() => openScoreModal(match)}
-                    >
-                      <Text className={styles.actionBtnText}>提交比分</Text>
-                    </View>
-                    <View 
-                      className={`${styles.actionBtn} ${styles.disputeBtn}`}
-                      onClick={() => openDisputeModal(match)}
-                    >
-                      <Text className={styles.disputeBtnText}>申请裁决</Text>
-                    </View>
+                <View className={styles.matchActions}>
+                  <View 
+                    className={`${styles.actionBtn} ${styles.scoreBtn}`}
+                    onClick={() => openScoreModal(match)}
+                  >
+                    <Text className={styles.actionBtnText}>提交比分</Text>
                   </View>
-                )}
-
-                {match.status === 'pending' && (
-                  <View className={styles.matchActions}>
-                    <View className={styles.scoreSection} style={{ marginTop: '16rpx', paddingTop: '16rpx' }}>
-                      <Text className={styles.matchNumber}>比赛时间：{match.startTime}</Text>
-                    </View>
+                  <View 
+                    className={`${styles.actionBtn} ${styles.disputeBtn}`}
+                    onClick={() => openDisputeModal(match)}
+                  >
+                    <Text className={styles.disputeBtnText}>申请裁决</Text>
                   </View>
-                )}
+                </View>
               </View>
             ))}
           </View>

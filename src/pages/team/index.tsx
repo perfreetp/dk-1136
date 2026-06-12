@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { Team, TeamMember } from '@/types';
-import { mockTeams } from '@/data/teams';
-import { mockEvents } from '@/data/events';
+import { getTeams, addTeam, updateTeam, deleteTeam } from '@/data/teams';
+import { mockEvents, addRegisteredTeam, isTeamRegistered } from '@/data/events';
 import styles from './index.module.scss';
 
 const TeamPage: React.FC = () => {
-  const [teams, setTeams] = useState<Team[]>(mockTeams);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [newTeamName, setNewTeamName] = useState('');
   const [inviteName, setInviteName] = useState('');
+
+  useDidShow(() => {
+    setTeams([...getTeams()]);
+  });
 
   const handleCreateTeam = () => {
     if (!newTeamName.trim()) {
@@ -38,7 +42,8 @@ const TeamPage: React.FC = () => {
       createdAt: new Date().toISOString().split('T')[0]
     };
 
-    setTeams([...teams, newTeam]);
+    addTeam(newTeam);
+    setTeams([...getTeams()]);
     setShowCreateModal(false);
     setNewTeamName('');
     Taro.showToast({ title: '战队创建成功', icon: 'success' });
@@ -56,6 +61,11 @@ const TeamPage: React.FC = () => {
     }
     if (!selectedTeam) return;
 
+    if (selectedTeam.memberCount >= selectedTeam.maxMembers) {
+      Taro.showToast({ title: '队伍已满员', icon: 'none' });
+      return;
+    }
+
     const newMember: TeamMember = {
       id: `u${Date.now()}`,
       name: inviteName.trim(),
@@ -63,14 +73,18 @@ const TeamPage: React.FC = () => {
       role: 'member'
     };
 
-    const updatedTeam = {
-      ...selectedTeam,
-      members: [...selectedTeam.members, newMember],
-      memberCount: selectedTeam.memberCount + 1
-    };
+    const updatedMembers = [...selectedTeam.members, newMember];
+    updateTeam(selectedTeam.id, {
+      members: updatedMembers,
+      memberCount: updatedMembers.length
+    });
 
-    setTeams(teams.map(t => t.id === updatedTeam.id ? updatedTeam : t));
-    setSelectedTeam(updatedTeam);
+    setSelectedTeam({
+      ...selectedTeam,
+      members: updatedMembers,
+      memberCount: updatedMembers.length
+    });
+    setTeams([...getTeams()]);
     setInviteName('');
     setShowInviteModal(false);
     Taro.showToast({ title: '队友添加成功', icon: 'success' });
@@ -84,14 +98,17 @@ const TeamPage: React.FC = () => {
     }
 
     const updatedMembers = selectedTeam.members.filter(m => m.id !== memberId);
-    const updatedTeam = {
+    updateTeam(selectedTeam.id, {
+      members: updatedMembers,
+      memberCount: updatedMembers.length
+    });
+
+    setSelectedTeam({
       ...selectedTeam,
       members: updatedMembers,
       memberCount: updatedMembers.length
-    };
-
-    setTeams(teams.map(t => t.id === updatedTeam.id ? updatedTeam : t));
-    setSelectedTeam(updatedTeam);
+    });
+    setTeams([...getTeams()]);
     Taro.showToast({ title: '已移除队友', icon: 'success' });
   };
 
@@ -103,7 +120,8 @@ const TeamPage: React.FC = () => {
       content: `确定要删除战队"${selectedTeam.name}"吗？`,
       success: (res) => {
         if (res.confirm) {
-          setTeams(teams.filter(t => t.id !== selectedTeam.id));
+          deleteTeam(selectedTeam.id);
+          setTeams([...getTeams()]);
           setShowDetailModal(false);
           setSelectedTeam(null);
           Taro.showToast({ title: '战队已删除', icon: 'success' });
@@ -129,8 +147,13 @@ const TeamPage: React.FC = () => {
       itemList: pendingEvents.map(e => `${e.title} (${e.game})`),
       success: (res) => {
         const event = pendingEvents[res.tapIndex];
+        if (isTeamRegistered(event.id, selectedTeam.id)) {
+          Taro.showToast({ title: '该队伍已报名此赛事', icon: 'none' });
+          return;
+        }
+        addRegisteredTeam(event.id, selectedTeam);
         console.log('[Team] 选择报名赛事:', { teamId: selectedTeam.id, eventId: event.id });
-        Taro.showToast({ title: `已选择"${event.title}"`, icon: 'success' });
+        Taro.showToast({ title: `已报名"${event.title}"`, icon: 'success' });
         setTimeout(() => {
           Taro.navigateTo({ url: `/pages/detail/index?id=${event.id}` });
         }, 1500);
@@ -179,7 +202,7 @@ const TeamPage: React.FC = () => {
                   <View key={member.id} className={styles.memberItem}>
                     <Image src={member.avatar} className={styles.memberAvatar} mode="aspectFill" />
                     <Text className={styles.memberName}>{member.name}</Text>
-                    {member.role === 'captain' && <Text className={styles.captainBadge}>�</Text>}
+                    {member.role === 'captain' && <Text className={styles.captainBadge}>👑</Text>}
                   </View>
                 ))}
                 {team.memberCount > 4 && (

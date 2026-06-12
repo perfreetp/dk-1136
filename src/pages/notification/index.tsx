@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { Notification } from '@/types';
-import { mockNotifications } from '@/data/notifications';
+import { getNotifications, markAsRead, markAllAsRead, getUnreadCount } from '@/data/notifications';
 import styles from './index.module.scss';
 
 type FilterType = 'all' | 'event' | 'match' | 'system';
 
 const NotificationPage: React.FC = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  useDidShow(() => {
+    setNotifications([...getNotifications()]);
+    setUnreadCount(getUnreadCount());
+  });
 
   const filteredNotifications = activeFilter === 'all' 
     ? notifications 
@@ -27,16 +31,15 @@ const NotificationPage: React.FC = () => {
   };
 
   const handleMarkAsRead = (id: string) => {
-    setNotifications(notifications.map(n => {
-      if (n.id === id) {
-        return { ...n, isRead: true };
-      }
-      return n;
-    }));
+    markAsRead(id);
+    setNotifications([...getNotifications()]);
+    setUnreadCount(getUnreadCount());
   };
 
   const handleMarkAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, isRead: true })));
+    markAllAsRead();
+    setNotifications([...getNotifications()]);
+    setUnreadCount(0);
   };
 
   const handleNotificationClick = (notification: Notification) => {

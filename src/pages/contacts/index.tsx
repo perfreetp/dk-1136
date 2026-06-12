@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, Input, Button } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { Contact } from '@/types';
-import { mockContacts } from '@/data/teams';
+import { getContacts, addContact, deleteContact } from '@/data/teams';
 import styles from './index.module.scss';
 
 const ContactsPage: React.FC = () => {
-  const [contacts, setContacts] = useState<Contact[]>(mockContacts);
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newRole, setNewRole] = useState('队友');
+
+  useDidShow(() => {
+    setContacts([...getContacts()]);
+  });
 
   const roleOptions = ['队友', '赛事主办', '裁判', '其他'];
 
@@ -24,14 +28,15 @@ const ContactsPage: React.FC = () => {
       return;
     }
 
-    const newContact: Contact = {
+    const contact: Contact = {
       id: `c${Date.now()}`,
       name: newName.trim(),
       phone: newPhone.trim(),
       role: newRole
     };
 
-    setContacts([...contacts, newContact]);
+    addContact(contact);
+    setContacts([...getContacts()]);
     setShowModal(false);
     setNewName('');
     setNewPhone('');
@@ -63,7 +68,8 @@ const ContactsPage: React.FC = () => {
       content: '确定要删除该联系人吗？',
       success: (res) => {
         if (res.confirm) {
-          setContacts(contacts.filter(c => c.id !== id));
+          deleteContact(id);
+          setContacts([...getContacts()]);
           Taro.showToast({ title: '已删除', icon: 'success' });
         }
       }

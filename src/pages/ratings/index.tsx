@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, Input, Button } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { Rating } from '@/types';
-import { mockRatings, mockHistory } from '@/data/teams';
+import { getRatings, addRating, getContacts } from '@/data/teams';
+import { mockHistory } from '@/data/teams';
 import styles from './index.module.scss';
 
 const RatingsPage: React.FC = () => {
-  const [ratings, setRatings] = useState<Rating[]>(mockRatings);
+  const [ratings, setRatings] = useState<Rating[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState('');
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState('');
+
+  useDidShow(() => {
+    setRatings([...getRatings()]);
+  });
 
   const participatedEvents = mockHistory.map(h => ({ id: h.eventId, title: h.eventTitle }));
 
@@ -34,7 +39,8 @@ const RatingsPage: React.FC = () => {
       date: new Date().toISOString().split('T')[0]
     };
 
-    setRatings([newRating, ...ratings]);
+    addRating(newRating);
+    setRatings([...getRatings()]);
     setShowModal(false);
     setSelectedEvent('');
     setRating(5);
