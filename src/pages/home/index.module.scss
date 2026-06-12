@@ -197,3 +197,169 @@
 .eventList {
   margin-top: $spacing-md;
 }
+
+.eventCard {
+  display: flex;
+  flex-direction: row;
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.eventCardLeft {
+  width: 120rpx;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.eventCardIcon {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-sm;
+  background-color: $color-bg-hover;
+}
+
+.eventCardRight {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventCardHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.eventCardTitle {
+  flex: 1;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+  margin-right: $spacing-sm;
+}
+
+.eventCardStatus {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-xs;
+  flex-shrink: 0;
+}
+
+.statusPending {
+  background-color: rgba($color-warning, 0.1);
+}
+
+.statusOngoing {
+  background-color: rgba($color-primary, 0.1);
+}
+
+.statusFinished {
+  background-color: rgba($color-success, 0.1);
+}
+
+.eventCardStatusText {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.statusPending .eventCardStatusText {
+  color: $color-warning;
+}
+
+.statusOngoing .eventCardStatusText {
+  color: $color-primary;
+}
+
+.statusFinished .eventCardStatusText {
+  color: $color-success;
+}
+
+.eventCardInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.eventCardInfoText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  @include text-ellipsis;
+}
+
+.eventCardInfoDot {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin: 0 $spacing-xs;
+}
+
+.eventCardFooter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xs;
+}
+
+.eventCardTags {
+  display: flex;
+  flex-direction: row;
+  gap: $spacing-xs;
+}
+
+.eventCardTag {
+  padding: 4rpx 12rpx;
+  background-color: $color-tag-bg;
+  border-radius: $radius-xs;
+}
+
+.eventCardTagText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+}
+
+.eventCardTeam {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+
+.eventCardTeamCount {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.eventCardTeamLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: 4rpx;
+}
+
+.eventCardPrice {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.eventCardPriceLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-right: $spacing-xs;
+}
+
+.eventCardPriceValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-error;
+}
+
+.eventCardFreeTag {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-success;
+}

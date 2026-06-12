@@ -140,10 +140,6 @@
   white-space: pre-wrap;
 }
 
-.teamsSection {
-  margin-top: $spacing-md;
-}
-
 .teamCount {
   font-size: $font-size-sm;
   color: $color-text-tertiary;
@@ -155,25 +151,81 @@
   margin-top: $spacing-md;
 }
 
+.signInSummary {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-md;
+  background-color: $color-bg-hover;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+}
+
+.signInItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.signInCount {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-success;
+}
+
+.signInCount.notSignedIn {
+  color: $color-warning;
+}
+
+.signInLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.signInDivider {
+  width: 1rpx;
+  height: 60rpx;
+  background-color: $color-divider;
+  margin: 0 $spacing-lg;
+}
+
+.teamListSection {
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.teamListTitle {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-sm;
+  padding-left: $spacing-xs;
+}
+
+.teamListTitle.notSignedInTitle {
+  color: $color-warning;
+}
+
 .teamItem {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: $spacing-md 0;
   border-bottom: 1rpx solid $color-divider;
-  
+
   &:last-child {
     border-bottom: none;
   }
-  
-  &:active {
-    opacity: 0.8;
-    background-color: $color-bg-hover;
-    margin: 0 -24rpx;
-    padding-left: 24rpx;
-    padding-right: 24rpx;
-    border-radius: $radius-sm;
-  }
+}
+
+.teamItem.teamItemNotSignedIn {
+  opacity: 0.8;
 }
 
 .teamAvatar {
@@ -203,14 +255,85 @@
   margin-top: 4rpx;
 }
 
-.teamMembers {
-  font-size: $font-size-sm;
-  color: $color-primary;
-  margin-right: $spacing-sm;
+.teamRight {
+  flex-shrink: 0;
 }
 
-.viewMore {
+.signInBtn {
+  @include button-reset;
+  padding: $spacing-xs $spacing-md;
+  background-color: $color-success;
+  border-radius: $radius-round;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signInBtnText {
   font-size: $font-size-sm;
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.signedInBadge {
+  padding: $spacing-xs $spacing-md;
+  background-color: rgba($color-success, 0.1);
+  border-radius: $radius-round;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signedInText {
+  font-size: $font-size-sm;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
+.scheduleCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.scheduleIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background-color: rgba($color-primary, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+  font-size: 40rpx;
+}
+
+.scheduleInfo {
+  flex: 1;
+}
+
+.scheduleTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.scheduleDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.scheduleArrow {
+  font-size: $font-size-xl;
   color: $color-text-tertiary;
 }
 

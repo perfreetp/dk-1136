@@ -1,34 +1,49 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, Input, ScrollView, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
-import { GameCategory, gameCategoryMap, Event } from '@/types';
-import { mockEvents, hotEvents } from '@/data/events';
-import EventCard from '@/components/EventCard';
-import EmptyState from '@/components/EmptyState';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { GameCategory, gameCategoryMap, Event, UnifiedTeam } from '@/types';
+import { getUnifiedEvents } from '@/utils/unifiedData';
 import styles from './index.module.scss';
 
 const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [activeCategory, setActiveCategory] = useState<GameCategory>('all');
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useDidShow(() => {
+    setRefreshKey(prev => prev + 1);
+  });
 
   const categories: GameCategory[] = ['all', 'lol', 'dota2', 'csgo', 'valorant', 'pubg', 'other'];
 
+  const eventsData = getUnifiedEvents();
+  const events = Object.values(eventsData).map(e => e.info);
+  const registeredCounts: Record<string, number> = {};
+  Object.entries(eventsData).forEach(([eventId, event]) => {
+    registeredCounts[eventId] = event.registeredTeams.length;
+  });
+
   const filteredEvents = useMemo(() => {
-    let events = mockEvents;
-    
+    let result = events.map(e => ({
+      ...e,
+      currentTeams: registeredCounts[e.id] || 0
+    }));
+
     if (activeCategory !== 'all') {
-      events = events.filter(e => e.game === activeCategory);
+      result = result.filter(e => e.game === activeCategory);
     }
-    
+
     if (searchText.trim()) {
-      events = events.filter(e => 
+      result = result.filter(e =>
         e.title.toLowerCase().includes(searchText.toLowerCase()) ||
         e.location.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-    
-    return events;
-  }, [activeCategory, searchText]);
+
+    return result;
+  }, [activeCategory, searchText, events, registeredCounts, refreshKey]);
+
+  const hotEvents = filteredEvents.filter(e => e.status === 'ongoing' || e.currentTeams >= 5).slice(0, 3);
 
   const handleSearch = (value: string) => {
     setSearchText(value);
@@ -132,20 +147,51 @@ const HomePage: React.FC = () => {
         </View>
         
         <View className={styles.eventList}>
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event) => (
-              <EventCard 
-                key={event.id} 
-                event={event}
-                onClick={handleEventClick}
-              />
-            ))
-          ) : (
-            <EmptyState 
-              title="暂无赛事"
-              description="换个筛选条件试试吧~"
-            />
-          )}
+          {filteredEvents.map((event) => (
+            <View key={event.id} className={styles.eventCard}>
+              <View className={styles.eventCardLeft} onClick={() => handleEventClick(event.id)}>
+                <Image src={event.gameIcon} className={styles.eventCardIcon} mode="aspectFill" />
+              </View>
+              <View className={styles.eventCardRight} onClick={() => handleEventClick(event.id)}>
+                <View className={styles.eventCardHeader}>
+                  <Text className={styles.eventCardTitle}>{event.title}</Text>
+                  <View className={`${styles.eventCardStatus} ${event.status === 'pending' ? styles.statusPending : event.status === 'ongoing' ? styles.statusOngoing : styles.statusFinished}`}>
+                    <Text className={styles.eventCardStatusText}>
+                      {event.status === 'pending' ? '报名中' : event.status === 'ongoing' ? '进行中' : '已结束'}
+                    </Text>
+                  </View>
+                </View>
+                <View className={styles.eventCardInfo}>
+                  <Text className={styles.eventCardInfoText}>{event.location}</Text>
+                  <Text className={styles.eventCardInfoDot}>·</Text>
+                  <Text className={styles.eventCardInfoText}>{event.startTime}</Text>
+                </View>
+                <View className={styles.eventCardFooter}>
+                  <View className={styles.eventCardTags}>
+                    {event.tags.slice(0, 2).map((tag, index) => (
+                      <View key={index} className={styles.eventCardTag}>
+                        <Text className={styles.eventCardTagText}>{tag}</Text>
+                      </View>
+                    ))}
+                  </View>
+                  <View className={styles.eventCardTeam}>
+                    <Text className={styles.eventCardTeamCount}>{event.currentTeams}/{event.maxTeams}</Text>
+                    <Text className={styles.eventCardTeamLabel}>队</Text>
+                  </View>
+                </View>
+                {event.entryFee > 0 ? (
+                  <View className={styles.eventCardPrice}>
+                    <Text className={styles.eventCardPriceLabel}>报名费</Text>
+                    <Text className={styles.eventCardPriceValue}>¥{event.entryFee}</Text>
+                  </View>
+                ) : (
+                  <View className={styles.eventCardPrice}>
+                    <Text className={styles.eventCardFreeTag}>免费</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          ))}
         </View>
       </View>
     </View>

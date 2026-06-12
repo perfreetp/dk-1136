@@ -108,6 +108,10 @@ export interface Rating {
   organizerReply?: string;
 }
 
+export interface UnifiedTeam extends Team {
+  signedIn: boolean;
+}
+
 export type GameCategory = 'all' | 'lol' | 'dota2' | 'csgo' | 'valorant' | 'pubg' | 'other';
 
 export const gameCategoryMap: Record<GameCategory, string> = {

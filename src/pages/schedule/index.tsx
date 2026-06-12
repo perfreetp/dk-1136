@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import { Match } from '@/types';
-import { getMatches, getEventById, updateMatch, generateFirstRoundMatches, getRegisteredTeams } from '@/data/events';
+import { getEvent, getMatches, submitScore, generateMatches, getMaxRound, getRoundName, getSignedInTeams, canRegenerateMatches, clearMatches, getTotalRounds } from '@/utils/unifiedData';
 import { submitDispute } from '@/data/notifications';
 import styles from './index.module.scss';
 
 const SchedulePage: React.FC = () => {
   const [eventId, setEventId] = useState<string | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [eventData, setEventData] = useState<any>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [activeRound, setActiveRound] = useState(1);
+  const [maxRound, setMaxRound] = useState(0);
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [showDisputeModal, setShowDisputeModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
@@ -33,45 +34,25 @@ const SchedulePage: React.FC = () => {
   });
 
   const loadEventData = (id: string) => {
-    const event = getEventById(id);
-    if (event) {
-      setSelectedEvent(event);
+    const data = getEvent(id);
+    if (data) {
+      setEventData(data);
+      const signedInTeams = getSignedInTeams(id);
+
       let eventMatches = getMatches(id);
-      
-      if (eventMatches.length === 0) {
-        const registeredTeams = getRegisteredTeams(id);
-        if (registeredTeams.length >= 2) {
-          eventMatches = generateFirstRoundMatches(id);
-        }
+      if (eventMatches.length === 0 && signedInTeams.length >= 2) {
+        eventMatches = generateMatches(id);
       }
-      
+
       setMatches(eventMatches);
-      if (eventMatches.length > 0) {
-        const maxRound = Math.max(...eventMatches.map(m => m.round));
-        setActiveRound(1);
-      }
+      const totalRounds = getTotalRounds(signedInTeams.length);
+      setMaxRound(totalRounds);
+      setActiveRound(1);
     }
   };
 
   const rounds = [...new Set(matches.map(m => m.round))].sort((a, b) => a - b);
   const currentRoundMatches = matches.filter(m => m.round === activeRound);
-
-  const getRoundName = (round: number) => {
-    const maxRound = Math.max(...rounds);
-    if (round === maxRound) return '决赛';
-    if (round === maxRound - 1) return '半决赛';
-    if (round === maxRound - 2) return '四分之一决赛';
-    return `第${round}轮`;
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'pending': return '待开始';
-      case 'ongoing': return '进行中';
-      case 'finished': return '已结束';
-      default: return '';
-    }
-  };
 
   const handleScoreSubmit = () => {
     if (!selectedMatch || !eventId) return;
@@ -84,20 +65,15 @@ const SchedulePage: React.FC = () => {
       return;
     }
 
-    const winner = s1 > s2 ? selectedMatch.team1Id : selectedMatch.team2Id;
-    
-    updateMatch(eventId, selectedMatch.id, {
-      score1: s1,
-      score2: s2,
-      status: 'finished',
-      winnerId: winner
-    });
-
+    const updatedMatch = submitScore(eventId, selectedMatch.id, s1, s2);
     loadEventData(eventId);
     setShowScoreModal(false);
     setScore1('');
     setScore2('');
-    Taro.showToast({ title: '比分已提交', icon: 'success' });
+    
+    if (updatedMatch?.winnerId) {
+      Taro.showToast({ title: '比分已提交', icon: 'success' });
+    }
   };
 
   const handleDisputeSubmit = () => {
@@ -110,6 +86,29 @@ const SchedulePage: React.FC = () => {
     setShowDisputeModal(false);
     setDisputeReason('');
     Taro.showToast({ title: '裁决申请已提交', icon: 'success' });
+  };
+
+  const handleRegenerateMatches = () => {
+    if (!eventId) return;
+
+    Taro.showModal({
+      title: '重新生成对阵',
+      content: '确定要重新生成对阵表吗？这将重置所有比赛结果。',
+      success: (res) => {
+        if (res.confirm) {
+          clearMatches(eventId);
+          const signedInTeams = getSignedInTeams(eventId);
+          if (signedInTeams.length >= 2) {
+            generateMatches(eventId);
+            loadEventData(eventId);
+            Taro.showToast({ title: '对阵已重新生成', icon: 'success' });
+          } else {
+            loadEventData(eventId);
+            Taro.showToast({ title: '签到队伍不足2队', icon: 'none' });
+          }
+        }
+      }
+    });
   };
 
   const openScoreModal = (match: Match) => {
@@ -136,32 +135,29 @@ const SchedulePage: React.FC = () => {
     );
   }
 
-  if (matches.length === 0) {
-    const registeredTeams = getRegisteredTeams(eventId);
+  const signedInTeams = eventData ? getSignedInTeams(eventId) : [];
+  
+  if (signedInTeams.length < 2) {
     return (
       <View className={styles.schedulePage}>
         <View className={styles.header}>
           <View className={styles.eventInfo}>
-            <Text className={styles.eventTitle}>{selectedEvent?.title || '赛事'}</Text>
-            <Text className={styles.eventMeta}>{selectedEvent?.location}</Text>
+            <Text className={styles.eventTitle}>{eventData?.info?.title || '赛事'}</Text>
+            <Text className={styles.eventMeta}>{eventData?.info?.location}</Text>
           </View>
         </View>
         <View className={styles.placeholderSection}>
           <Text className={styles.placeholderIcon}>⏳</Text>
-          <Text className={styles.placeholderTitle}>
-            {registeredTeams.length < 2 ? '等待更多队伍报名' : '对阵表生成中'}
-          </Text>
+          <Text className={styles.placeholderTitle}>等待签到</Text>
           <Text className={styles.placeholderDesc}>
-            {registeredTeams.length < 2 
-              ? `当前 ${registeredTeams.length} 队报名，至少需要 2 队才能生成对阵` 
-              : '请耐心等待，系统正在生成对阵表'}
+            当前 {signedInTeams.length} 队已签到，至少需要 2 队签到才能生成对阵
           </Text>
-          {registeredTeams.length > 0 && (
+          {signedInTeams.length > 0 && (
             <View style={{ marginTop: '32rpx' }}>
-              <Text style={{ color: '#94A3B8', fontSize: '24rpx' }}>已报名队伍：</Text>
-              {registeredTeams.map((team, index) => (
-                <Text key={index} style={{ color: '#6366F1', fontSize: '24rpx', marginTop: '8rpx' }}>
-                  {index + 1}. {team.name}
+              <Text style={{ color: '#94A3B8', fontSize: '24rpx' }}>已签到队伍：</Text>
+              {signedInTeams.map((team: any, index: number) => (
+                <Text key={index} style={{ color: '#10B981', fontSize: '24rpx', marginTop: '8rpx', display: 'block' }}>
+                  ✓ {team.name}
                 </Text>
               ))}
             </View>
@@ -171,12 +167,30 @@ const SchedulePage: React.FC = () => {
     );
   }
 
+  if (matches.length === 0) {
+    return (
+      <View className={styles.schedulePage}>
+        <View className={styles.header}>
+          <View className={styles.eventInfo}>
+            <Text className={styles.eventTitle}>{eventData?.info?.title || '赛事'}</Text>
+            <Text className={styles.eventMeta}>{eventData?.info?.location}</Text>
+          </View>
+        </View>
+        <View className={styles.placeholderSection}>
+          <Text className={styles.placeholderIcon}>🔄</Text>
+          <Text className={styles.placeholderTitle}>正在生成对阵表</Text>
+          <Text className={styles.placeholderDesc}>请稍候...</Text>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View className={styles.schedulePage}>
       <View className={styles.header}>
         <View className={styles.eventInfo}>
-          <Text className={styles.eventTitle}>{selectedEvent?.title || '赛事'}</Text>
-          <Text className={styles.eventMeta}>{selectedEvent?.location}</Text>
+          <Text className={styles.eventTitle}>{eventData?.info?.title || '赛事'}</Text>
+          <Text className={styles.eventMeta}>{eventData?.info?.location}</Text>
         </View>
         <View className={styles.tabList}>
           {rounds.map(round => (
@@ -186,11 +200,16 @@ const SchedulePage: React.FC = () => {
               onClick={() => setActiveRound(round)}
             >
               <Text className={`${styles.tabText} ${activeRound === round ? styles.tabTextActive : ''}`}>
-                {getRoundName(round)}
+                {getRoundName(round, maxRound)}
               </Text>
             </View>
           ))}
         </View>
+        {canRegenerateMatches(eventId) && matches.length > 0 && (
+          <View className={styles.regenerateBtn} onClick={handleRegenerateMatches}>
+            <Text className={styles.regenerateBtnText}>🔄 刷新对阵</Text>
+          </View>
+        )}
       </View>
 
       <View className={styles.content}>
@@ -199,7 +218,8 @@ const SchedulePage: React.FC = () => {
             <View className={styles.roundBadge}>
               <Text className={styles.roundBadgeText}>{activeRound}</Text>
             </View>
-            {getRoundName(activeRound)}
+            {getRoundName(activeRound, maxRound)}
+            <Text className={styles.roundInfo}>（{currentRoundMatches.length}场比赛）</Text>
           </View>
 
           <View className={styles.matchList}>
@@ -210,7 +230,9 @@ const SchedulePage: React.FC = () => {
                     第{match.matchNumber}场
                   </Text>
                   <View className={`${styles.matchStatus} ${match.status === 'pending' ? styles.statusPending : match.status === 'ongoing' ? styles.statusOngoing : styles.statusFinished}`}>
-                    <Text className={styles.statusText}>{getStatusText(match.status)}</Text>
+                    <Text className={styles.statusText}>
+                      {match.status === 'pending' ? '待开始' : match.status === 'ongoing' ? '进行中' : '已结束'}
+                    </Text>
                   </View>
                 </View>
 
@@ -222,26 +244,43 @@ const SchedulePage: React.FC = () => {
                       mode="aspectFill" 
                     />
                     <Text className={styles.teamName}>{match.team1Name}</Text>
+                    {match.winnerId === match.team1Id && match.status === 'finished' && (
+                      <View className={styles.winnerBadge}>
+                        <Text className={styles.winnerText}>🏆</Text>
+                      </View>
+                    )}
                   </View>
                   <Text className={styles.vsText}>VS</Text>
                   <View className={`${styles.teamItem} ${styles.teamItemRight}`}>
-                    <Image 
-                      src={match.team2Avatar || 'https://picsum.photos/id/2/100/100'} 
-                      className={`${styles.teamAvatar} ${styles.teamAvatarRight}`} 
-                      mode="aspectFill" 
-                    />
-                    <Text className={`${styles.teamName} ${styles.teamNameRight}`}>{match.team2Name}</Text>
+                    {match.team2Name !== '轮空' && (
+                      <>
+                        <Text className={`${styles.teamName} ${styles.teamNameRight}`}>{match.team2Name}</Text>
+                        {match.winnerId === match.team2Id && match.status === 'finished' && (
+                          <View className={styles.winnerBadge}>
+                            <Text className={styles.winnerText}>🏆</Text>
+                          </View>
+                        )}
+                        <Image 
+                          src={match.team2Avatar || 'https://picsum.photos/id/2/100/100'} 
+                          className={`${styles.teamAvatar} ${styles.teamAvatarRight}`} 
+                          mode="aspectFill" 
+                        />
+                      </>
+                    )}
+                    {match.team2Name === '轮空' && (
+                      <Text className={styles.byeText}>轮空</Text>
+                    )}
                   </View>
                 </View>
 
-                {match.status !== 'pending' && (
+                {match.status !== 'pending' && match.team2Name !== '轮空' && (
                   <View className={styles.scoreSection}>
                     <View className={styles.scoreItem}>
                       <Text className={`${styles.scoreValue} ${match.winnerId === match.team1Id ? styles.winnerScore : ''}`}>
                         {match.score1 ?? '-'}
                       </Text>
                     </View>
-                    <Text className={styles.vsText}>:</Text>
+                    <Text className={styles.scoreSeparator}>:</Text>
                     <View className={styles.scoreItem}>
                       <Text className={`${styles.scoreValue} ${match.winnerId === match.team2Id ? styles.winnerScore : ''}`}>
                         {match.score2 ?? '-'}

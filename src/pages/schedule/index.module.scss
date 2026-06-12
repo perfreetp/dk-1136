@@ -92,6 +92,13 @@
   font-weight: $font-weight-semibold;
 }
 
+.roundInfo {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  font-weight: $font-weight-normal;
+  margin-left: $spacing-sm;
+}
+
 .matchList {
   display: flex;
   flex-direction: column;
@@ -125,31 +132,31 @@
 
 .statusPending {
   background-color: rgba($color-warning, 0.1);
-  
-  .statusText {
-    color: $color-warning;
-  }
 }
 
 .statusOngoing {
   background-color: rgba($color-primary, 0.1);
-  
-  .statusText {
-    color: $color-primary;
-  }
 }
 
 .statusFinished {
   background-color: rgba($color-success, 0.1);
-  
-  .statusText {
-    color: $color-success;
-  }
 }
 
 .statusText {
   font-size: $font-size-xs;
   font-weight: $font-weight-medium;
+}
+
+.statusPending .statusText {
+  color: $color-warning;
+}
+
+.statusOngoing .statusText {
+  color: $color-primary;
+}
+
+.statusFinished .statusText {
+  color: $color-success;
 }
 
 .teamsRow {
@@ -202,6 +209,20 @@
   margin: 0 $spacing-sm;
 }
 
+.winnerBadge {
+  margin-left: $spacing-xs;
+}
+
+.winnerText {
+  font-size: 24rpx;
+}
+
+.byeText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  font-style: italic;
+}
+
 .scoreSection {
   display: flex;
   flex-direction: row;
@@ -229,6 +250,12 @@
 
 .winnerScore {
   color: $color-success;
+}
+
+.scoreSeparator {
+  font-size: $font-size-xl;
+  color: $color-text-tertiary;
+  margin: 0 $spacing-sm;
 }
 
 .matchActions {
@@ -372,22 +399,20 @@
   border: 2rpx solid $color-border;
 }
 
-.emptyState {
+.regenerateBtn {
+  margin-top: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background-color: rgba($color-primary, 0.1);
+  border-radius: $radius-md;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $spacing-xl * 2;
 }
 
-.emptyIcon {
-  font-size: 80rpx;
-  margin-bottom: $spacing-md;
-}
-
-.emptyText {
-  font-size: $font-size-md;
-  color: $color-text-tertiary;
+.regenerateBtnText {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  font-weight: $font-weight-medium;
 }
 
 .placeholderSection {
@@ -414,4 +439,5 @@
 .placeholderDesc {
   font-size: $font-size-md;
   color: $color-text-tertiary;
+  text-align: center;
 }

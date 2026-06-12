@@ -3,7 +3,7 @@ import { View, Text, Image, Input, Button, ScrollView } from '@tarojs/components
 import Taro, { useDidShow } from '@tarojs/taro';
 import { Team, TeamMember } from '@/types';
 import { getTeams, addTeam, updateTeam, deleteTeam } from '@/data/teams';
-import { mockEvents, addRegisteredTeam, isTeamRegistered } from '@/data/events';
+import { registerTeam } from '@/utils/unifiedData';
 import styles from './index.module.scss';
 
 const TeamPage: React.FC = () => {
@@ -137,28 +137,11 @@ const TeamPage: React.FC = () => {
       return;
     }
 
-    const pendingEvents = mockEvents.filter(e => e.status === 'pending');
-    if (pendingEvents.length === 0) {
-      Taro.showToast({ title: '暂无可报名赛事', icon: 'none' });
-      return;
-    }
-
-    Taro.showActionSheet({
-      itemList: pendingEvents.map(e => `${e.title} (${e.game})`),
-      success: (res) => {
-        const event = pendingEvents[res.tapIndex];
-        if (isTeamRegistered(event.id, selectedTeam.id)) {
-          Taro.showToast({ title: '该队伍已报名此赛事', icon: 'none' });
-          return;
-        }
-        addRegisteredTeam(event.id, selectedTeam);
-        console.log('[Team] 选择报名赛事:', { teamId: selectedTeam.id, eventId: event.id });
-        Taro.showToast({ title: `已报名"${event.title}"`, icon: 'success' });
-        setTimeout(() => {
-          Taro.navigateTo({ url: `/pages/detail/index?id=${event.id}` });
-        }, 1500);
-      }
-    });
+    Taro.showToast({ title: '请到赛事详情页报名参赛', icon: 'none' });
+    setShowDetailModal(false);
+    setTimeout(() => {
+      Taro.switchTab({ url: '/pages/home/index' });
+    }, 1500);
   };
 
   const handleCopyInvite = () => {
